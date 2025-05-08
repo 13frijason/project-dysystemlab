@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도연시스템연구소 - 전문적인 냉난방 설비 솔루션</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-snowflake"></i>
+                도연시스템연구소
+            </div>
+            <ul>
+                <li><a href="#home">홈</a></li>
+                <li><a href="#services">서비스</a></li>
+                <li><a href="#about">회사소개</a></li>
+                <li><a href="{{ url_for('board') }}">견적문의</a></li>
+                <li><a href="#contact">연락처</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home" class="hero-section">
+        <div class="hero-content">
+            <h1>최고의 냉난방 설비 솔루션</h1>
+            <p>전문적인 기술력과 20년 이상의 경험으로 최적의 냉난방 시스템을 제공합니다.</p>
+            <a href="#estimate" class="cta-button">견적문의 하기</a>
+        </div>
+    </section>
+
+    <section id="services" class="services-section">
+        <div class="section-container">
+            <h2 class="section-title">우리의 서비스</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <i class="fas fa-temperature-low"></i>
+                    <h3>에어컨 설치</h3>
+                    <p>가정용, 업소용, 시스템 에어컨의 전문 설치 서비스를 제공합니다.</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-tools"></i>
+                    <h3>정기 점검</h3>
+                    <p>정기적인 점검과 관리로 시스템의 수명을 연장하고 효율을 극대화합니다.</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-wrench"></i>
+                    <h3>수리 서비스</h3>
+                    <p>신속하고 정확한 진단과 수리로 문제를 해결해드립니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about-section">
+        <div class="section-container">
+            <h2 class="section-title">회사 소개</h2>
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="{{ url_for('static', filename='images/about.jpg') }}" alt="도연시스템연구소 전경">
+                </div>
+                <div class="about-text">
+                    <p>도연시스템연구소는 20년 이상의 경험을 바탕으로 최고의 냉난방 설비 솔루션을 제공하는 전문 기업입니다.</p>
+                    <ul class="about-features">
+                        <li><i class="fas fa-check"></i> 전문 기술진 보유</li>
+                        <li><i class="fas fa-check"></i> 20년 이상의 현장 경험</li>
+                        <li><i class="fas fa-check"></i> 신속한 고객 응대</li>
+                        <li><i class="fas fa-check"></i> 합리적인 가격</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="estimate" class="estimate-section">
+        <div class="section-container">
+            <h2 class="section-title">견적문의</h2>
+            <div class="estimate-container">
+                <form class="estimate-form" action="{{ url_for('submit_estimate') }}" method="POST">
+                    <div class="form-group">
+                        <label for="name">이름 *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">연락처 *</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">설치주소 *</label>
+                        <input type="text" id="address" name="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="service_type">문의 서비스 *</label>
+                        <select id="service_type" name="service_type" required>
+                            <option value="">선택해주세요</option>
+                            <option value="에어컨 설치">에어컨 설치</option>
+                            <option value="정기 점검">정기 점검</option>
+                            <option value="수리 서비스">수리 서비스</option>
+                            <option value="기타">기타</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">상세 내용 *</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-button">견적문의 보내기</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+        <div class="section-container">
+            <h2 class="section-title">연락처</h2>
+            <div class="contact-info">
+                <div class="contact-card">
+                    <i class="fas fa-phone"></i>
+                    <h3>전화</h3>
+                    <p>010-2789-3051</p>
+                </div>
+                <div class="contact-card">
+                    <i class="fas fa-envelope"></i>
+                    <h3>이메일</h3>
+                    <p>info@doyeon.com</p>
+                </div>
+                <div class="contact-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>주소</h3>
+                    <p>서울특별시 강남구</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3><i class="fas fa-snowflake"></i> 도연시스템연구소</h3>
+                <p>최고의 전문성과 서비스로 고객님께 만족을 드리겠습니다.</p>
+            </div>
+            <div class="footer-contact">
+                <p><i class="fas fa-phone"></i> 010-2789-3051</p>
+                <p><i class="fas fa-envelope"></i> info@doyeon.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 도연시스템연구소. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 
