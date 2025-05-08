@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>견적문의 상세보기 - 도연시스템연구소</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="post-container">
+        <div class="post-header">
+            <h1 class="post-title">{{ estimate.type }} 견적문의 ({{ estimate.location }})</h1>
+            <div class="post-info">
+                <div class="post-info-left">
+                    <span class="post-info-item">
+                        <i class="fas fa-user"></i>
+                        작성자: {{ estimate.name }}
+                    </span>
+                    <span class="post-info-item">
+                        <i class="fas fa-phone"></i>
+                        연락처: {{ estimate.phone[:4] }}****{{ estimate.phone[-4:] }}
+                    </span>
+                </div>
+                <div class="post-info-right">
+                    <span class="post-info-item">
+                        <i class="fas fa-calendar"></i>
+                        작성일: {{ estimate.created_at.strftime('%Y-%m-%d') }}
+                    </span>
+                    <span class="post-info-item">
+                        <i class="fas fa-clock"></i>
+                        상태: <span class="status-{{ 'pending' if estimate.status == '대기중' else 'completed' }}">
+                            {{ estimate.status }}
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="post-content">
+            <div class="content-section">
+                <h3>설치 정보</h3>
+                <div class="estimate-details">
+                    <div class="estimate-item">
+                        <h4>설치 유형</h4>
+                        <p>{{ estimate.type }}</p>
+                    </div>
+                    <div class="estimate-item">
+                        <h4>설치 장소</h4>
+                        <p>{{ estimate.location }}</p>
+                    </div>
+                    <div class="estimate-item">
+                        <h4>평수</h4>
+                        <p>{{ estimate.size }}평</p>
+                    </div>
+                    {% if estimate.install_date %}
+                    <div class="estimate-item">
+                        <h4>설치 희망일</h4>
+                        <p>{{ estimate.install_date.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h3>설치 주소</h3>
+                <p>{{ estimate.address }}</p>
+            </div>
+
+            {% if estimate.message %}
+            <div class="content-section">
+                <h3>추가 요청사항</h3>
+                <p>{{ estimate.message }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="button-group">
+            <a href="{{ url_for('board') }}" class="btn btn-secondary">목록으로</a>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 

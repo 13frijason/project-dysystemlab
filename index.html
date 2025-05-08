@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도연시스템연구소</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 기존 스타일 유지 */
+        
+        .form-group small.form-text {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            color: var(--text-color);
+            background-color: var(--white);
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-group input[type="number"],
+        .form-group input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+
+        .form-group input[type="number"]:focus,
+        .form-group input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* 기존 스타일 계속 */
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-snowflake"></i>
+                도연시스템연구소
+            </div>
+            <ul>
+                <li><a href="#home">홈</a></li>
+                <li><a href="#services">서비스</a></li>
+                <li><a href="#about">회사소개</a></li>
+                <li><a href="board.html">견적문의</a></li>
+                <li><a href="#contact">연락처</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>최고의 전문 에어컨 설치 서비스</h1>
+            <p>20년 경력의 전문가가 완벽하게 설치해드립니다</p>
+            <div class="hero-buttons">
+                <a href="#estimate" class="cta-button primary">무료 견적 받기</a>
+            </div>
+        </div>
+        <div class="hero-overlay"></div>
+    </section>
+
+    <section id="services" class="services">
+        <h2>우리의 서비스</h2>
+        <p class="section-description">전문적이고 신뢰할 수 있는 에어컨 설치 서비스를 제공합니다</p>
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="https://images.unsplash.com/photo-1581785735604-417e1f81c548?w=800&q=80" alt="에어컨 설치">
+                </div>
+                <h3>에어컨 설치</h3>
+                <p>신속하고 안전한 설치로 쾌적한 환경을 만들어드립니다</p>
+                <ul class="service-features">
+                    <li><i class="fas fa-check"></i> 무료 현장 방문</li>
+                    <li><i class="fas fa-check"></i> 당일 설치 가능</li>
+                    <li><i class="fas fa-check"></i> 완벽한 마감</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="https://images.unsplash.com/photo-1631545806609-35d4ae440431?w=800&q=80" alt="에어컨 이전 설치">
+                </div>
+                <h3>이전 설치</h3>
+                <p>이사 시 안전하고 완벽한 이전 설치를 보장합니다</p>
+                <ul class="service-features">
+                    <li><i class="fas fa-check"></i> 안전한 철거</li>
+                    <li><i class="fas fa-check"></i> 완벽한 재설치</li>
+                    <li><i class="fas fa-check"></i> 배관 작업</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="https://images.unsplash.com/photo-1563453392212-326f5e854473?w=800&q=80" alt="에어컨 청소">
+                </div>
+                <h3>에어컨 청소</h3>
+                <p>전문적인 청소로 깨끗한 공기를 제공합니다</p>
+                <ul class="service-features">
+                    <li><i class="fas fa-check"></i> 분해 청소</li>
+                    <li><i class="fas fa-check"></i> 항균 처리</li>
+                    <li><i class="fas fa-check"></i> 필터 교체</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="about-grid">
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&q=80" alt="전문 기술자">
+            </div>
+            <div class="about-content">
+                <h2>회사 소개</h2>
+                <p class="about-description">20년 경력의 전문가들로 구성된 저희 회사는 고객님의 만족을 최우선으로 생각합니다.</p>
+                <div class="about-features">
+                    <div class="feature-item">
+                        <i class="fas fa-tools"></i>
+                        <h3>전문 기술자 보유</h3>
+                        <p>숙련된 전문가의 완벽시공</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-bolt"></i>
+                        <h3>신속한 서비스</h3>
+                        <p>당일 설치 및 긴급출동</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <h3>합리적인 가격</h3>
+                        <p>투명한 견적과 가격</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>A/S 보장</h3>
+                        <p>설치 후 1년 무상 A/S</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="estimate" class="section">
+        <div class="section-container">
+            <h2 class="section-title">무료 견적문의</h2>
+            <p class="section-description">에어컨 설치에 대한 견적을 무료로 문의하실 수 있습니다.</p>
+            
+            <form id="estimate-form" class="estimate-form">
+                <div class="form-group">
+                    <label for="name">이름 *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">연락처 *</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">설치주소 *</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="location">설치장소 *</label>
+                    <select id="location" name="location" required>
+                        <option value="">선택해주세요</option>
+                        <option value="아파트">아파트</option>
+                        <option value="주택">주택</option>
+                        <option value="사무실">사무실</option>
+                        <option value="상가">상가</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="size">평수 *</label>
+                    <input type="number" id="size" name="size" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="install_date">설치희망일</label>
+                    <input type="date" id="install_date" name="install_date">
+                </div>
+                
+                <div class="form-group">
+                    <label for="type">설치종류 *</label>
+                    <select id="type" name="type" required>
+                        <option value="">선택해주세요</option>
+                        <option value="신규 설치">신규 설치</option>
+                        <option value="이전 설치">이전 설치</option>
+                        <option value="청소/점검">청소/점검</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">추가 메시지</label>
+                    <textarea id="message" name="message" rows="4"></textarea>
+                </div>
+                
+                <button type="submit" class="submit-button">
+                    <i class="fas fa-paper-plane"></i>
+                    견적 요청하기
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2>연락처</h2>
+        <p class="section-description">언제든지 문의해주세요. 친절히 상담해드리겠습니다.</p>
+        <div class="contact-info">
+            <div class="contact-card">
+                <i class="fas fa-phone"></i>
+                <h3>전화 문의</h3>
+                <p>010-2789-3051</p>
+                <a href="tel:010-2789-3051" class="contact-button">전화하기</a>
+            </div>
+            <div class="contact-card">
+                <i class="fas fa-map-marker-alt"></i>
+                <h3>위치</h3>
+                <p>장항 한강3로 30 </p>
+                <a href="https://maps.google.com" target="_blank" class="contact-button">길찾기</a>
+            </div>
+            <div class="contact-card">
+                <i class="fas fa-clock"></i>
+                <h3>영업시간</h3>
+                <p>평일: 09:00 - 18:00<br>주말: 10:00 - 15:00</p>
+                <a href="#contact" class="contact-button">상담예약</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3><i class="fas fa-snowflake"></i> 도연시스템연구소</h3>
+                <p>최고의 전문성과 서비스로 고객님께 만족을 드리겠습니다.</p>
+            </div>
+            <div class="footer-contact">
+                <p><i class="fas fa-phone"></i> 010-2789-3051</p>
+                <p><i class="fas fa-envelope"></i> info@doyeon.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 도연시스템연구소. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

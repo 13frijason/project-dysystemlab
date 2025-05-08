@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>견적문의 게시판 - 도연시스템연구소</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .delete-button {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+        .delete-button:hover {
+            background-color: #cc0000;
+        }
+        .board-table th,
+        .board-table td {
+            padding: 12px;
+            text-align: center;
+        }
+        .board-table th:last-child,
+        .board-table td:last-child {
+            width: 100px;
+        }
+        .board-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .board-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .login-button {
+            background-color: #007bff;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-snowflake"></i>
+                도연시스템연구소
+            </div>
+            <ul>
+                <li><a href="{{ url_for('index') }}">홈</a></li>
+                <li><a href="{{ url_for('index') }}#services">서비스</a></li>
+                <li><a href="{{ url_for('index') }}#about">회사소개</a></li>
+                <li><a href="{{ url_for('board') }}">견적문의</a></li>
+                <li><a href="{{ url_for('index') }}#contact">연락처</a></li>
+                {% if session.get('admin_logged_in') %}
+                <li><a href="{{ url_for('logout') }}" class="login-button">로그아웃</a></li>
+                {% else %}
+                <li><a href="{{ url_for('login') }}" class="login-button">로그인</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <div class="board-container">
+        <div class="board-header">
+            <h1 class="board-title">견적문의 게시판</h1>
+            <div class="board-actions">
+                <a href="{{ url_for('index') }}#estimate" class="write-button">
+                    <i class="fas fa-pen"></i>
+                    견적문의 작성
+                </a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if estimates.items %}
+        <table class="board-table">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>이름</th>
+                    <th>연락처</th>
+                    <th>서비스 종류</th>
+                    <th>작성일</th>
+                    <th>상태</th>
+                    <th>관리</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for estimate in estimates.items %}
+                <tr>
+                    <td>{{ estimate.id }}</td>
+                    <td>{{ estimate.name }}</td>
+                    <td>{{ estimate.phone }}</td>
+                    <td>{{ estimate.service_type }}</td>
+                    <td>{{ estimate.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <span class="status-{{ 'completed' if estimate.status == '완료' else 'pending' }}">
+                            {{ estimate.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if session.get('admin_logged_in') %}
+                        <button class="delete-button" onclick="deleteEstimate({{ estimate.id }})">
+                            <i class="fas fa-trash"></i> 삭제
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="board-pagination">
+            {% if estimates.has_prev %}
+                <a href="{{ url_for('board', page=estimates.prev_num) }}" class="page-button">&laquo; 이전</a>
+            {% endif %}
+            
+            {% for page_num in estimates.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                {% if page_num %}
+                    <a href="{{ url_for('board', page=page_num) }}" 
+                       class="page-button {{ 'active' if page_num == estimates.page else '' }}">
+                        {{ page_num }}
+                    </a>
+                {% else %}
+                    <span class="page-button">...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if estimates.has_next %}
+                <a href="{{ url_for('board', page=estimates.next_num) }}" class="page-button">다음 &raquo;</a>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="no-posts">
+            <i class="fas fa-inbox"></i>
+            아직 등록된 견적문의가 없습니다.
+        </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3><i class="fas fa-snowflake"></i> 도연시스템연구소</h3>
+                <p>최고의 전문성과 서비스로 고객님께 만족을 드리겠습니다.</p>
+            </div>
+            <div class="footer-contact">
+                <p><i class="fas fa-phone"></i> 010-2789-3051</p>
+                <p><i class="fas fa-envelope"></i> info@doyeon.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 도연시스템연구소. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+    function deleteEstimate(id) {
+        if (confirm('정말로 이 견적문의를 삭제하시겠습니까?')) {
+            fetch(`/api/estimates/${id}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('견적문의가 삭제되었습니다.');
+                    location.reload();
+                } else {
+                    throw new Error('삭제 실패');
+                }
+            })
+            .catch(error => {
+                alert('견적문의 삭제 중 오류가 발생했습니다.');
+                console.error('Error:', error);
+            });
+        }
+    }
+    </script>
+</body>
+</html> 

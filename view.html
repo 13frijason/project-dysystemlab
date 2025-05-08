@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>견적문의 상세보기 - 도연시스템연구소</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .post-container {
+            max-width: 1000px;
+            margin: 120px auto 50px;
+            padding: 0 20px;
+        }
+
+        .post-header {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .post-title {
+            font-size: 1.8rem;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .post-info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: var(--text-color);
+        }
+
+        .post-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .post-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .content-section {
+            margin-bottom: 30px;
+        }
+
+        .content-section h3 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .content-section p {
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        .estimate-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .estimate-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .estimate-item h4 {
+            font-size: 1rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .post-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .post-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-snowflake"></i>
+                도연시스템연구소
+            </div>
+            <ul>
+                <li><a href="index.html">홈</a></li>
+                <li><a href="index.html#services">서비스</a></li>
+                <li><a href="index.html#about">회사소개</a></li>
+                <li><a href="index.html#estimate">견적문의</a></li>
+                <li><a href="index.html#contact">연락처</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="board-container">
+        <div class="board-header">
+            <h1 id="post-title" class="board-title">견적문의 상세보기</h1>
+            <div class="post-info">
+                <span id="post-date"></span>
+                <span id="post-status" class="status-pending">대기중</span>
+            </div>
+        </div>
+
+        <div class="post-content">
+            <div id="post-details" class="post-details">
+                <!-- JavaScript로 동적으로 채워질 부분 -->
+            </div>
+        </div>
+
+        <div class="post-actions">
+            <a href="board.html" class="button">
+                <i class="fas fa-list"></i>
+                목록으로
+            </a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3><i class="fas fa-snowflake"></i> 도연시스템연구소</h3>
+                <p>최고의 전문성과 서비스로 고객님께 만족을 드리겠습니다.</p>
+            </div>
+            <div class="footer-contact">
+                <p><i class="fas fa-phone"></i> 010-2789-3051</p>
+                <p><i class="fas fa-envelope"></i> info@doyeon.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 도연시스템연구소. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html> 

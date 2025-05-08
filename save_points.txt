@@ -1,0 +1,7 @@
+save3 - 2024-04-20
+- app.py: 데이터베이스 초기화 로직 수정, API 엔드포인트 구현
+- templates/board.html: 삭제 버튼 추가 및 삭제 기능 구현
+- templates/index.html: 회사 소개 섹션 이미지 및 레이아웃 수정
+- static/css/styles.css: 게시판 삭제 버튼 스타일 및 레이아웃 수정
+- static/images/about.jpg: 회사 소개 이미지
+- static/images/hero-bg.jpg: 히어로 섹션 배경 이미지 

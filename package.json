@@ -1,0 +1,13 @@
+{
+  "name": "doyeon-system",
+  "version": "1.0.0",
+  "description": "도연시스템연구소 웹사이트",
+  "main": "script.js",
+  "scripts": {
+    "lint": "eslint templates/**/*.html script.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-plugin-html": "^7.1.0"
+  }
+} 
