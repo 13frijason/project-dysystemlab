@@ -5,17 +5,26 @@
     box-sizing: border-box;
 }
 
+:root {
+    --primary-color: #1a73e8;
+    --secondary-color: #1557b0;
+    --text-color: #333;
+    --light-gray: #f5f5f5;
+    --white: #fff;
+    --shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
 body {
     font-family: 'Noto Sans KR', sans-serif;
     line-height: 1.6;
-    color: #333;
-    background-color: #f5f5f5;
+    color: var(--text-color);
+    background-color: var(--light-gray);
 }
 
 /* Header Styles */
 header {
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: var(--white);
+    box-shadow: var(--shadow);
     position: fixed;
     width: 100%;
     top: 0;
@@ -34,7 +43,7 @@ nav {
 .logo {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1a73e8;
+    color: var(--primary-color);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -48,13 +57,13 @@ nav ul {
 
 nav a {
     text-decoration: none;
-    color: #333;
+    color: var(--text-color);
     font-weight: 500;
     transition: color 0.3s;
 }
 
 nav a:hover {
-    color: #1a73e8;
+    color: var(--primary-color);
 }
 
 /* Hero Section */
@@ -67,7 +76,7 @@ nav a:hover {
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: white;
+    color: var(--white);
     padding: 0 20px;
     margin-top: -80px;
 }
@@ -93,14 +102,14 @@ nav a:hover {
 .cta-button {
     display: inline-block;
     background-color: transparent;
-    color: white;
+    color: var(--white);
     padding: 1.2rem 3rem;
     border-radius: 5px;
     text-decoration: none;
     font-weight: 500;
     font-size: 1.1rem;
     transition: all 0.3s ease;
-    border: 2px solid white;
+    border: 2px solid var(--white);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     animation: fadeIn 1.5s ease-out;
 }
@@ -122,7 +131,7 @@ nav a:hover {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 3rem;
-    color: #333;
+    color: var(--text-color);
     position: relative;
 }
 
@@ -131,13 +140,13 @@ nav a:hover {
     display: block;
     width: 50px;
     height: 3px;
-    background-color: #1a73e8;
+    background-color: var(--primary-color);
     margin: 1rem auto;
 }
 
 /* Services Section */
 .services-section {
-    background-color: #f8f9fa;
+    background-color: var(--light-gray);
 }
 
 .services-grid {
@@ -147,11 +156,11 @@ nav a:hover {
 }
 
 .service-card {
-    background-color: white;
+    background-color: var(--white);
     padding: 2rem;
     border-radius: 10px;
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow);
     transition: transform 0.3s;
 }
 
@@ -161,19 +170,19 @@ nav a:hover {
 
 .service-card i {
     font-size: 2.5rem;
-    color: #1a73e8;
+    color: var(--primary-color);
     margin-bottom: 1rem;
 }
 
 .service-card h3 {
     margin-bottom: 1rem;
-    color: #333;
+    color: var(--text-color);
 }
 
 /* About Section */
 .about-section {
     position: relative;
-    background-color: #fff;
+    background-color: var(--white);
     padding: 2.5rem 0;
 }
 
@@ -211,7 +220,7 @@ nav a:hover {
 .about-text p {
     margin-bottom: 2.5rem;
     line-height: 1.8;
-    color: #333;
+    color: var(--text-color);
 }
 
 .about-features {
@@ -225,11 +234,11 @@ nav a:hover {
     display: flex;
     align-items: center;
     gap: 1rem;
-    color: #333;
+    color: var(--text-color);
 }
 
 .about-features i {
-    color: #1a73e8;
+    color: var(--primary-color);
     font-size: 1.2rem;
     width: 30px;
     height: 30px;
@@ -242,7 +251,7 @@ nav a:hover {
 
 /* Contact Section */
 .contact-section {
-    background-color: #f8f9fa;
+    background-color: var(--light-gray);
 }
 
 .contact-info {
@@ -252,11 +261,11 @@ nav a:hover {
 }
 
 .contact-card {
-    background-color: white;
+    background-color: var(--white);
     padding: 2rem;
     border-radius: 10px;
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow);
     transition: transform 0.3s;
 }
 
@@ -266,13 +275,13 @@ nav a:hover {
 
 .contact-card i {
     font-size: 2rem;
-    color: #1a73e8;
+    color: var(--primary-color);
     margin-bottom: 1rem;
 }
 
 .contact-card h3 {
     margin-bottom: 1rem;
-    color: #333;
+    color: var(--text-color);
 }
 
 /* Board Styles */
@@ -392,18 +401,18 @@ nav a:hover {
     border: 1px solid #f5c6cb;
 }
 
-/* Estimate Form */
+/* Estimate Section */
 .estimate-section {
-    background-color: #f8f9fa;
+    background-color: var(--light-gray);
 }
 
 .estimate-container {
     max-width: 800px;
     margin: 0 auto;
-    background-color: white;
+    background-color: var(--white);
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow);
 }
 
 .estimate-form {
@@ -419,7 +428,7 @@ nav a:hover {
 
 .form-group label {
     font-weight: 500;
-    color: #333;
+    color: var(--text-color);
 }
 
 .form-group label::after {
@@ -448,7 +457,7 @@ nav a:hover {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #1a73e8;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
 }
 
@@ -458,8 +467,8 @@ nav a:hover {
 }
 
 button.submit-button {
-    background-color: #1a73e8;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--white);
     padding: 1rem;
     border: none;
     border-radius: 5px;
@@ -471,13 +480,13 @@ button.submit-button {
 }
 
 button.submit-button:hover {
-    background-color: #1557b0;
+    background-color: var(--secondary-color);
 }
 
 /* Footer */
 footer {
     background-color: #333;
-    color: white;
+    color: var(--white);
     padding: 3rem 0 1rem;
 }
 
@@ -630,5 +639,29 @@ footer {
     .form-group select,
     .form-group textarea {
         padding: 0.6rem;
+    }
+}
+
+/* 메뉴 토글 버튼 스타일 제거 */
+.menu-toggle {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: none;
+    }
+    
+    nav ul {
+        display: flex;
+        flex-direction: row;
+        position: static;
+        background: none;
+        padding: 0;
+        box-shadow: none;
+    }
+    
+    nav ul li {
+        margin: 0 10px;
     }
 } 

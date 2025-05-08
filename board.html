@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>견적문의 게시판 - 도연시스템연구소</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="static/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -175,22 +175,51 @@
 
         .delete-button {
             padding: 6px 12px;
-            background-color: #dc3545;
+            background-color: #ff4444;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.9rem;
-            transition: all 0.3s;
+            transition: background-color 0.3s;
         }
 
         .delete-button:hover {
-            background-color: #c82333;
-            transform: translateY(-1px);
+            background-color: #cc0000;
         }
 
         .delete-button i {
             margin-right: 4px;
+        }
+
+        .board-table th,
+        .board-table td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        .board-table th:last-child,
+        .board-table td:last-child {
+            width: 100px;
+        }
+
+        .board-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .login-button {
+            background-color: #007bff;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .login-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -205,8 +234,9 @@
                 <li><a href="index.html">홈</a></li>
                 <li><a href="index.html#services">서비스</a></li>
                 <li><a href="index.html#about">회사소개</a></li>
-                <li><a href="index.html#estimate">견적문의</a></li>
+                <li><a href="board.html">견적문의</a></li>
                 <li><a href="index.html#contact">연락처</a></li>
+                <li><a href="login.html" class="login-button">로그인</a></li>
             </ul>
         </nav>
     </header>
@@ -214,10 +244,12 @@
     <div class="board-container">
         <div class="board-header">
             <h1 class="board-title">견적문의 게시판</h1>
-            <a href="index.html#estimate" class="write-button">
-                <i class="fas fa-pen"></i>
-                견적문의 작성
-            </a>
+            <div class="board-actions">
+                <a href="index.html#estimate" class="write-button">
+                    <i class="fas fa-pen"></i>
+                    견적문의 작성
+                </a>
+            </div>
         </div>
 
         <div class="search-box">
@@ -253,8 +285,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-
     <footer>
         <div class="footer-content">
             <div class="footer-info">
@@ -270,5 +300,7 @@
             <p>&copy; 2024 도연시스템연구소. All rights reserved.</p>
         </div>
     </footer>
+
+    <script src="static/js/script.js"></script>
 </body>
 </html> 

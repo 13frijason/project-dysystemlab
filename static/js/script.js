@@ -1,73 +1,121 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // 스크롤 시 헤더 스타일 변경
+    window.addEventListener('scroll', function() {
+        const header = document.querySelector('header');
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+
     // 전화번호 입력 필드 포맷팅
     const phoneInput = document.getElementById('phone');
     if (phoneInput) {
         phoneInput.addEventListener('input', function(e) {
-            let number = e.target.value.replace(/[^0-9]/g, '');
-            if (number.length > 11) {
-                number = number.slice(0, 11);
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 3) {
+                    value = value;
+                } else if (value.length <= 7) {
+                    value = value.slice(0, 3) + '-' + value.slice(3);
+                } else {
+                    value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+                }
             }
-            if (number.length > 7) {
-                number = number.slice(0, 3) + '-' + number.slice(3, 7) + '-' + number.slice(7);
-            } else if (number.length > 3) {
-                number = number.slice(0, 3) + '-' + number.slice(3);
-            }
-            e.target.value = number;
+            e.target.value = value;
         });
     }
 
-    // 견적문의 폼 제출
-    const estimateForm = document.getElementById('estimateForm');
+    // 스크롤 애니메이션
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('nav a');
+
+    function highlightNavLink() {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (pageYOffset >= sectionTop - 200) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').substring(1) === current) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', highlightNavLink);
+
+    // 부드러운 스크롤
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (this.getAttribute('href').startsWith('#')) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+    });
+
+    // 견적문의 폼 제출 처리
+    const estimateForm = document.querySelector('.estimate-form');
     if (estimateForm) {
         estimateForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
             // 필수 필드 검증
-            const requiredFields = ['name', 'phone', 'address', 'location', 'size', 'type'];
+            const requiredFields = estimateForm.querySelectorAll('[required]');
             let isValid = true;
             
             requiredFields.forEach(field => {
-                const input = document.getElementById(field);
-                if (!input.value.trim()) {
+                if (!field.value.trim()) {
                     isValid = false;
-                    input.classList.add('error');
+                    field.classList.add('error');
                 } else {
-                    input.classList.remove('error');
+                    field.classList.remove('error');
                 }
             });
-
+            
             if (!isValid) {
-                alert('필수 항목을 모두 입력해주세요.');
+                alert('모든 필수 항목을 입력해주세요.');
                 return;
             }
-
-            // 폼 데이터를 JSON으로 변환
+            
+            // 폼 데이터 수집
             const formData = new FormData(estimateForm);
-            const data = {};
-            for (let [key, value] of formData.entries()) {
-                data[key] = value;
-            }
-
+            const data = Object.fromEntries(formData.entries());
+            
             // API 요청
-            fetch('/api/estimates', {
+            fetch('/submit_estimate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw err; });
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('견적문의가 성공적으로 접수되었습니다.');
+                    estimateForm.reset();
+                } else {
+                    alert('견적문의 접수 중 오류가 발생했습니다.');
                 }
-                return response.json();
-            })
-            .then(data => {
-                alert('견적문의가 성공적으로 등록되었습니다.');
-                window.location.href = '/board';
             })
             .catch(error => {
-                alert('견적문의 등록 중 오류가 발생했습니다: ' + (error.error || '알 수 없는 오류'));
+                console.error('Error:', error);
+                alert('견적문의 접수 중 오류가 발생했습니다.');
             });
         });
     }
