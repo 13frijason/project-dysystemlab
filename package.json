@@ -1,13 +1,23 @@
 {
-  "name": "doyeon-system",
+  "name": "doyeon-system-lab",
   "version": "1.0.0",
-  "description": "도연시스템연구소 웹사이트",
-  "main": "script.js",
+  "description": "도연시스템연구소 공식 웹사이트",
+  "main": "index.html",
   "scripts": {
-    "lint": "eslint templates/**/*.html script.js"
+    "dev": "netlify dev",
+    "build": "echo 'No build step required'",
+    "deploy": "netlify deploy --prod"
   },
+  "keywords": [
+    "냉난방",
+    "에어컨",
+    "설비",
+    "견적"
+  ],
+  "author": "도연시스템연구소",
+  "license": "MIT",
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "eslint-plugin-html": "^7.1.0"
-  }
+    "netlify-cli": "^15.0.0"
+  },
+  "dependencies": {}
 } 

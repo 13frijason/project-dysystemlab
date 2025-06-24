@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="static/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
         .board-container {
             max-width: 1200px;
@@ -226,17 +227,19 @@
 <body>
     <header>
         <nav>
-            <div class="logo">
-                <i class="fas fa-snowflake"></i>
+            <div class="logo" style="display:flex; align-items:center; gap:8px;">
+                <img src="static/company_logo.png" alt="로고" style="height:32px;">
                 도연시스템연구소
             </div>
             <ul>
                 <li><a href="index.html">홈</a></li>
                 <li><a href="index.html#services">서비스</a></li>
                 <li><a href="index.html#about">회사소개</a></li>
-                <li><a href="board.html">견적문의</a></li>
                 <li><a href="index.html#contact">연락처</a></li>
-                <li><a href="login.html" class="login-button">로그인</a></li>
+                <li id="login-status">
+                    <a href="#" id="login-button" class="login-button" style="display: none;">로그인</a>
+                    <a href="#" id="logout-button" class="login-button" style="display: none;">로그아웃</a>
+                </li>
             </ul>
         </nav>
     </header>
@@ -252,36 +255,25 @@
             </div>
         </div>
 
-        <div class="search-box">
-            <input type="text" class="search-input" placeholder="검색어를 입력하세요...">
-            <button class="search-button">
-                <i class="fas fa-search"></i>
-                검색
-            </button>
-        </div>
+        <div id="flash-messages" class="flash-messages" style="display: none;"></div>
 
-        <table class="board-table">
-            <thead>
-                <tr>
-                    <th>제목</th>
-                    <th>설치종류</th>
-                    <th>설치장소</th>
-                    <th>작성일</th>
-                    <th>상태</th>
-                    <th>관리</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- JavaScript로 동적으로 채워질 부분 -->
-            </tbody>
-        </table>
+        <div class="board-content">
+            <div id="loading" class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>견적문의를 불러오는 중...</p>
+            </div>
+            
+            <div id="estimates-list" class="estimates-list" style="display: none;">
+                <!-- 견적문의 목록이 여기에 동적으로 로드됩니다 -->
+            </div>
 
-        <div class="board-pagination">
-            <button class="page-button active">1</button>
-            <button class="page-button">2</button>
-            <button class="page-button">3</button>
-            <button class="page-button">4</button>
-            <button class="page-button">5</button>
+            <div id="no-estimates" class="no-estimates" style="display: none;">
+                <p>아직 견적문의가 없습니다.</p>
+                <a href="index.html#estimate" class="write-button">첫 번째 견적문의 작성하기</a>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div id="pagination" class="pagination" style="display: none;"></div>
         </div>
     </div>
 
@@ -301,6 +293,212 @@
         </div>
     </footer>
 
-    <script src="static/js/script.js"></script>
+    <script>
+        let currentUser = null;
+        let currentPage = 1;
+        const perPage = 10;
+
+        // Netlify Identity 초기화
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                currentUser = user;
+                updateLoginStatus(user);
+                loadEstimates();
+            });
+            
+            window.netlifyIdentity.on("login", user => {
+                currentUser = user;
+                updateLoginStatus(user);
+                loadEstimates();
+            });
+            
+            window.netlifyIdentity.on("logout", () => {
+                currentUser = null;
+                updateLoginStatus(null);
+                loadEstimates();
+            });
+        }
+
+        function updateLoginStatus(user) {
+            const loginButton = document.getElementById('login-button');
+            const logoutButton = document.getElementById('logout-button');
+            
+            if (user) {
+                loginButton.style.display = 'none';
+                logoutButton.style.display = 'inline-block';
+                logoutButton.onclick = () => {
+                    window.netlifyIdentity.logout();
+                };
+            } else {
+                loginButton.style.display = 'inline-block';
+                logoutButton.style.display = 'none';
+                loginButton.onclick = () => {
+                    window.netlifyIdentity.open();
+                };
+            }
+        }
+
+        // 견적문의 목록 로드
+        async function loadEstimates() {
+            const loading = document.getElementById('loading');
+            const estimatesList = document.getElementById('estimates-list');
+            const noEstimates = document.getElementById('no-estimates');
+            const pagination = document.getElementById('pagination');
+
+            loading.style.display = 'block';
+            estimatesList.style.display = 'none';
+            noEstimates.style.display = 'none';
+            pagination.style.display = 'none';
+
+            try {
+                const response = await fetch(`/.netlify/functions/get-estimates?page=${currentPage}&per_page=${perPage}`);
+                const data = await response.json();
+
+                if (data.estimates && data.estimates.length > 0) {
+                    displayEstimates(data.estimates);
+                    displayPagination(data);
+                    estimatesList.style.display = 'block';
+                } else {
+                    noEstimates.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('견적문의를 불러오는데 실패했습니다:', error);
+                showFlashMessage('견적문의를 불러오는데 실패했습니다.', 'error');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // 견적문의 표시
+        function displayEstimates(estimates) {
+            const container = document.getElementById('estimates-list');
+            
+            container.innerHTML = estimates.map(estimate => `
+                <div class="estimate-item" data-id="${estimate.id}">
+                    <div class="estimate-header">
+                        <h3 class="estimate-title">${estimate.title}</h3>
+                        <span class="estimate-date">${formatDate(estimate.created_at)}</span>
+                    </div>
+                    <div class="estimate-info">
+                        <p class="estimate-name">작성자: <span class="name-text">${estimate.name}</span></p>
+                        <p class="estimate-phone">연락처: <span class="phone-text">${estimate.phone}</span></p>
+                        <p class="estimate-service">서비스: ${estimate.service_type}</p>
+                    </div>
+                    <div class="estimate-content">
+                        <p>${estimate.content.substring(0, 100)}${estimate.content.length > 100 ? '...' : ''}</p>
+                    </div>
+                    <div class="estimate-actions">
+                        <button onclick="viewEstimate('${estimate.id}')" class="view-button">상세보기</button>
+                        ${currentUser ? `<button onclick="deleteEstimate('${estimate.id}')" class="delete-button">삭제</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 페이지네이션 표시
+        function displayPagination(data) {
+            const pagination = document.getElementById('pagination');
+            
+            if (data.total_pages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            if (data.page > 1) {
+                paginationHTML += `<a href="#" onclick="goToPage(${data.page - 1})" class="page-link">&laquo; 이전</a>`;
+            }
+            
+            for (let i = 1; i <= data.total_pages; i++) {
+                if (i === data.page) {
+                    paginationHTML += `<span class="page-link current">${i}</span>`;
+                } else {
+                    paginationHTML += `<a href="#" onclick="goToPage(${i})" class="page-link">${i}</a>`;
+                }
+            }
+            
+            if (data.page < data.total_pages) {
+                paginationHTML += `<a href="#" onclick="goToPage(${data.page + 1})" class="page-link">다음 &raquo;</a>`;
+            }
+            
+            pagination.innerHTML = paginationHTML;
+            pagination.style.display = 'block';
+        }
+
+        // 페이지 이동
+        function goToPage(page) {
+            currentPage = page;
+            loadEstimates();
+        }
+
+        // 견적문의 상세보기
+        function viewEstimate(id) {
+            // 모달 또는 새 페이지로 상세보기 구현
+            alert('상세보기 기능은 준비 중입니다.');
+        }
+
+        // 견적문의 삭제
+        async function deleteEstimate(id) {
+            if (!currentUser) {
+                alert('관리자 로그인이 필요합니다.');
+                return;
+            }
+
+            if (!confirm('정말로 이 견적문의를 삭제하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                const token = await window.netlifyIdentity.currentUser().jwt();
+                const response = await fetch('/.netlify/functions/delete-estimate', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ id })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showFlashMessage('견적문의가 삭제되었습니다.', 'success');
+                    loadEstimates();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showFlashMessage('견적문의 삭제 중 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        // 플래시 메시지 표시
+        function showFlashMessage(message, type) {
+            const flashContainer = document.getElementById('flash-messages');
+            flashContainer.innerHTML = `<div class="flash-message flash-${type}">${message}</div>`;
+            flashContainer.style.display = 'block';
+            
+            setTimeout(() => {
+                flashContainer.style.display = 'none';
+            }, 5000);
+        }
+
+        // 날짜 포맷팅
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ko-KR');
+        }
+
+        // 페이지 로드 시 견적문의 로드
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.netlifyIdentity && window.netlifyIdentity.currentUser()) {
+                currentUser = window.netlifyIdentity.currentUser();
+                updateLoginStatus(currentUser);
+            }
+            loadEstimates();
+        });
+    </script>
 </body>
 </html> 
