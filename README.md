@@ -2,6 +2,8 @@
 
 전문적인 냉난방 설비 솔루션을 제공하는 도연시스템연구소의 공식 웹사이트입니다.
 
+**마지막 업데이트**: 2024년 12월 21일 - Netlify Functions 기반 서버리스 게시판 시스템 완성
+
 ## 🚀 Netlify 배포 가이드
 
 ### 1. Netlify 계정 생성 및 사이트 배포
@@ -44,6 +46,11 @@
 ├── admin/                  # 관리자 페이지
 │   ├── index.html         # Netlify CMS 대시보드
 │   └── config.yml         # CMS 설정
+├── netlify/               # Netlify Functions
+│   └── functions/         # 서버리스 함수들
+│       ├── submit-estimate.js
+│       ├── get-estimates.js
+│       └── delete-estimate.js
 ├── static/                 # 정적 파일
 │   ├── css/
 │   ├── js/
@@ -57,31 +64,35 @@
 
 ### 사용자 기능
 - ✅ 회사 소개 및 서비스 안내
-- ✅ 견적문의 작성 및 조회
+- ✅ 견적문의 작성 및 조회 (서버리스)
 - ✅ 시공사례 갤러리
 - ✅ 반응형 디자인
 
 ### 관리자 기능
 - ✅ Netlify Identity 기반 로그인
 - ✅ Netlify CMS를 통한 콘텐츠 관리
-- ✅ 견적문의 관리
+- ✅ 견적문의 관리 (작성/조회/삭제)
 - ✅ 시공사례 등록/수정/삭제
+
+### 서버리스 기능
+- ✅ Netlify Functions 기반 견적문의 시스템
+- ✅ 자동 확장 및 무료 호스팅
+- ✅ Git 기반 데이터 관리
 
 ## 🛠️ 로컬 개발
 
 ### 요구사항
-- Python 3.9+
-- Flask
-- SQLAlchemy
+- Node.js 16+
+- Netlify CLI
 
 ### 설치 및 실행
 
 ```bash
 # 의존성 설치
-pip install -r requirements.txt
+npm install
 
-# Flask 앱 실행
-python app.py
+# 로컬 개발 서버 실행
+npm run dev
 ```
 
 ### Netlify CMS 로컬 테스트
