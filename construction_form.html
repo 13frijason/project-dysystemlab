@@ -3,12 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>도연시스템연구소 - 시공사진</title>
+    <title>도연시스템연구소 - 시공사진 작성</title>
     <link rel="stylesheet" href="static/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
+        .construction-form {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-group input[type="file"] {
+            padding: 0.5rem;
+        }
+
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .cancel-btn {
+            background-color: #6c757d;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background-color: #545b62;
+        }
+
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 0.5rem;
+            border-radius: 4px;
+            display: none;
+        }
+
         .login-button {
             background-color: #007bff;
             color: white;
@@ -36,55 +118,6 @@
         .admin-button:hover {
             background-color: #218838;
         }
-
-        .write-button {
-            background-color: #28a745;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 2rem;
-            transition: background-color 0.3s;
-        }
-
-        .write-button:hover {
-            background-color: #218838;
-        }
-
-        .delete-button {
-            background-color: #dc3545;
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            margin-top: 0.5rem;
-            transition: background-color 0.3s;
-        }
-
-        .delete-button:hover {
-            background-color: #c82333;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            font-size: 1.1rem;
-            color: #666;
-        }
-
-        .error {
-            text-align: center;
-            padding: 2rem;
-            color: #dc3545;
-            font-size: 1.1rem;
-        }
     </style>
 </head>
 <body>
@@ -110,19 +143,35 @@
         </nav>
     </header>
 
-    <div class="construction-board">
-        <div class="board-header">
-            <h1>시공사진 게시판</h1>
-            <div id="write-button-container" style="display: none;">
-                <a href="construction_form.html" class="write-button">
-                    <i class="fas fa-plus"></i> 글 작성
-                </a>
+    <div class="construction-form">
+        <h2>시공사진 게시물 작성</h2>
+        <form id="constructionForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">제목 *</label>
+                <input type="text" id="title" name="title" required>
             </div>
-        </div>
 
-        <div id="posts-container">
-            <div class="loading">게시물을 불러오는 중...</div>
-        </div>
+            <div class="form-group">
+                <label for="date">작성일 *</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="image">이미지 *</label>
+                <input type="file" id="image" name="image" accept="image/*" required>
+                <img id="imagePreview" class="preview-image" alt="미리보기">
+            </div>
+
+            <div class="form-group">
+                <label for="description">설명 *</label>
+                <textarea id="description" name="description" required placeholder="시공 내용에 대한 상세한 설명을 입력해주세요."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <a href="construction.html" class="cancel-btn">취소</a>
+                <button type="submit" class="submit-btn">게시물 등록</button>
+            </div>
+        </form>
     </div>
 
     <footer>
@@ -142,8 +191,6 @@
     </footer>
 
     <script>
-        let isLoggedIn = false;
-
         // Netlify Identity 초기화
         if (window.netlifyIdentity) {
             window.netlifyIdentity.on("init", user => {
@@ -170,15 +217,12 @@
             const loginButton = document.getElementById('login-button');
             const logoutButton = document.getElementById('logout-button');
             const adminLink = document.getElementById('admin-link');
-            const writeButtonContainer = document.getElementById('write-button-container');
             
             if (user) {
                 console.log('Setting logged in state');
-                isLoggedIn = true;
                 loginButton.style.display = 'none';
                 logoutButton.style.display = 'inline-block';
                 adminLink.style.display = 'inline-block';
-                writeButtonContainer.style.display = 'block';
                 logoutButton.onclick = () => {
                     if (window.netlifyIdentity) {
                         window.netlifyIdentity.logout();
@@ -190,11 +234,9 @@
                 };
             } else {
                 console.log('Setting logged out state');
-                isLoggedIn = false;
                 loginButton.style.display = 'inline-block';
                 logoutButton.style.display = 'none';
                 adminLink.style.display = 'none';
-                writeButtonContainer.style.display = 'none';
                 loginButton.onclick = () => {
                     console.log('Login button clicked');
                     if (window.netlifyIdentity) {
@@ -207,83 +249,51 @@
                     }
                 };
             }
-            
-            // 게시물 다시 로드
-            loadConstructionPosts();
         }
 
-        // 게시물 로드 함수
-        async function loadConstructionPosts() {
-            const container = document.getElementById('posts-container');
+        // 이미지 미리보기
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        // 폼 제출 처리
+        document.getElementById('constructionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
             
             try {
-                const response = await fetch('/.netlify/functions/get-construction');
-                if (response.ok) {
-                    const posts = await response.json();
-                    displayPosts(posts);
-                } else {
-                    container.innerHTML = '<div class="error">게시물을 불러오는데 실패했습니다.</div>';
-                }
-            } catch (error) {
-                console.error('Error loading posts:', error);
-                container.innerHTML = '<div class="error">게시물을 불러오는데 실패했습니다.</div>';
-            }
-        }
-
-        // 게시물 표시 함수
-        function displayPosts(posts) {
-            const container = document.getElementById('posts-container');
-            
-            if (posts.length === 0) {
-                container.innerHTML = '<div class="loading">등록된 게시물이 없습니다.</div>';
-                return;
-            }
-            
-            const postsHTML = posts.map(post => `
-                <div class="post-card" data-id="${post.id}">
-                    <div class="post-image">
-                        <img src="${post.imageUrl}" alt="${post.title}">
-                    </div>
-                    <div class="post-content">
-                        <h3>${post.title}</h3>
-                        <p class="post-date">${post.date}</p>
-                        <p class="post-text">${post.description}</p>
-                        ${isLoggedIn ? `<button class="delete-button" onclick="deletePost('${post.id}')">삭제</button>` : ''}
-                    </div>
-                </div>
-            `).join('');
-            
-            container.innerHTML = `<div class="posts-grid">${postsHTML}</div>`;
-        }
-
-        // 게시물 삭제 함수
-        async function deletePost(postId) {
-            if (!confirm('정말로 이 게시물을 삭제하시겠습니까?')) {
-                return;
-            }
-            
-            try {
-                const response = await fetch('/.netlify/functions/delete-construction', {
+                const response = await fetch('/.netlify/functions/submit-construction', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ id: postId })
+                    body: formData
                 });
                 
                 if (response.ok) {
-                    alert('게시물이 삭제되었습니다.');
-                    loadConstructionPosts();
+                    alert('게시물이 성공적으로 등록되었습니다.');
+                    window.location.href = 'construction.html';
                 } else {
-                    alert('게시물 삭제에 실패했습니다.');
+                    const error = await response.text();
+                    alert('게시물 등록에 실패했습니다: ' + error);
                 }
             } catch (error) {
-                console.error('Error deleting post:', error);
-                alert('게시물 삭제 중 오류가 발생했습니다.');
+                console.error('Error:', error);
+                alert('게시물 등록 중 오류가 발생했습니다.');
             }
-        }
+        });
 
-        // 페이지 로드 시 로그인 상태 확인 및 게시물 로드
+        // 페이지 로드 시 로그인 상태 확인
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM loaded, checking login status');
             if (window.netlifyIdentity && window.netlifyIdentity.currentUser()) {
@@ -295,12 +305,13 @@
                 // 로컬 테스트를 위해 3초 후 자동 로그인 (선택사항)
                 setTimeout(() => {
                     console.log('Auto-login for local testing');
-                    if (!isLoggedIn) {
-                        updateLoginStatus({ email: 'admin@test.com', name: '관리자' });
-                        alert('로컬 테스트 모드: 자동으로 관리자로 로그인되었습니다.');
-                    }
+                    updateLoginStatus({ email: 'admin@test.com', name: '관리자' });
+                    alert('로컬 테스트 모드: 자동으로 관리자로 로그인되었습니다.');
                 }, 3000);
             }
+            
+            // 오늘 날짜를 기본값으로 설정
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
         });
     </script>
 </body>
