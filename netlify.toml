@@ -1,6 +1,6 @@
 [build]
   publish = "."
-  command = "npm run build"
+  command = "echo 'Static site - no build required'"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -26,6 +26,16 @@
 [[redirects]]
   from = "/construction"
   to = "/construction.html"
+  status = 200
+
+[[redirects]]
+  from = "/view/*"
+  to = "/view.html"
+  status = 200
+
+[[redirects]]
+  from = "/projects"
+  to = "/projects.html"
   status = 200
 
 [[redirects]]
