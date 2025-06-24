@@ -36,34 +36,50 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify([])
+        body: JSON.stringify({
+          estimates: [],
+          total: 0,
+          page: 1,
+          per_page: 10,
+          total_pages: 0
+        })
       };
     }
 
-    // 모든 JSON 파일 읽기
+    // 모든 JSON 파일 읽기 (최적화된 방식)
     const files = await fs.readdir(dataDir);
     const jsonFiles = files.filter(file => file.endsWith('.json'));
     
+    // 파일 수가 많을 경우를 대비한 최적화
     const estimates = [];
+    const batchSize = 50; // 한 번에 처리할 파일 수
     
-    for (const file of jsonFiles) {
-      try {
-        const filePath = path.join(dataDir, file);
-        const content = await fs.readFile(filePath, 'utf8');
-        const estimate = JSON.parse(content);
-        
-        // 개인정보 마스킹 (관리자가 아닌 경우)
-        const isAdmin = event.headers.authorization && event.headers.authorization.includes('Bearer');
-        
-        if (!isAdmin) {
-          estimate.name = maskName(estimate.name);
-          estimate.phone = maskPhone(estimate.phone);
+    for (let i = 0; i < jsonFiles.length; i += batchSize) {
+      const batch = jsonFiles.slice(i, i + batchSize);
+      
+      const batchPromises = batch.map(async (file) => {
+        try {
+          const filePath = path.join(dataDir, file);
+          const content = await fs.readFile(filePath, 'utf8');
+          const estimate = JSON.parse(content);
+          
+          // 개인정보 마스킹 (관리자가 아닌 경우)
+          const isAdmin = event.headers.authorization && event.headers.authorization.includes('Bearer');
+          
+          if (!isAdmin) {
+            estimate.name = maskName(estimate.name);
+            estimate.phone = maskPhone(estimate.phone);
+          }
+          
+          return estimate;
+        } catch (err) {
+          console.error(`Error reading file ${file}:`, err);
+          return null;
         }
-        
-        estimates.push(estimate);
-      } catch (err) {
-        console.error(`Error reading file ${file}:`, err);
-      }
+      });
+      
+      const batchResults = await Promise.all(batchPromises);
+      estimates.push(...batchResults.filter(estimate => estimate !== null));
     }
 
     // 날짜순으로 정렬 (최신순)
@@ -76,6 +92,9 @@ exports.handler = async (event, context) => {
     const endIndex = startIndex + perPage;
     const paginatedEstimates = estimates.slice(startIndex, endIndex);
 
+    // 캐시 헤더 추가 (5분 캐시)
+    headers['Cache-Control'] = 'public, max-age=300';
+
     return {
       statusCode: 200,
       headers,
@@ -84,7 +103,8 @@ exports.handler = async (event, context) => {
         total: estimates.length,
         page: page,
         per_page: perPage,
-        total_pages: Math.ceil(estimates.length / perPage)
+        total_pages: Math.ceil(estimates.length / perPage),
+        has_more: page < Math.ceil(estimates.length / perPage)
       })
     };
 
