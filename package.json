@@ -20,7 +20,9 @@
   "devDependencies": {
     "netlify-cli": "^15.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "mongodb": "^6.3.0"
+  },
   "engines": {
     "node": ">=16.0.0"
   }
