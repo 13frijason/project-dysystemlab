@@ -2,6 +2,9 @@ const fs = require('fs').promises;
 const path = require('path');
 
 exports.handler = async (event, context) => {
+  console.log('Function started:', event.httpMethod);
+  console.log('Event body:', event.body);
+  
   // CORS 헤더 설정
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -11,6 +14,7 @@ exports.handler = async (event, context) => {
 
   // OPTIONS 요청 처리 (CORS preflight)
   if (event.httpMethod === 'OPTIONS') {
+    console.log('Handling OPTIONS request');
     return {
       statusCode: 200,
       headers,
@@ -20,6 +24,7 @@ exports.handler = async (event, context) => {
 
   // POST 요청만 허용
   if (event.httpMethod !== 'POST') {
+    console.log('Invalid method:', event.httpMethod);
     return {
       statusCode: 405,
       headers,
@@ -28,10 +33,13 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    console.log('Parsing request body...');
     const data = JSON.parse(event.body);
+    console.log('Parsed data:', data);
     
     // 필수 필드 검증
     if (!data.name || !data.phone || !data.service_type || !data.content) {
+      console.log('Missing required fields:', { name: !!data.name, phone: !!data.phone, service_type: !!data.service_type, content: !!data.content });
       return {
         statusCode: 400,
         headers,
@@ -55,21 +63,31 @@ exports.handler = async (event, context) => {
       user_agent: event.headers['user-agent'] || 'unknown'
     };
 
+    console.log('Created estimate object:', estimate);
+
     // 데이터를 JSON 파일로 저장
     const dataDir = path.join(process.cwd(), 'content', 'estimates');
     const filePath = path.join(dataDir, `${estimate.id}.json`);
     
+    console.log('Data directory:', dataDir);
+    console.log('File path:', filePath);
+    
     // 디렉토리가 없으면 생성
     try {
+      console.log('Creating directory...');
       await fs.mkdir(dataDir, { recursive: true });
+      console.log('Directory created successfully');
     } catch (err) {
-      console.log('Directory already exists or cannot be created');
+      console.log('Directory creation error (might already exist):', err.message);
     }
 
     // 파일에 데이터 저장
+    console.log('Writing file...');
     await fs.writeFile(filePath, JSON.stringify(estimate, null, 2));
+    console.log('File written successfully');
 
     // 성공 응답
+    console.log('Sending success response');
     return {
       statusCode: 200,
       headers,
@@ -82,11 +100,15 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Detailed error:', error);
+    console.error('Error stack:', error.stack);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: '서버 오류가 발생했습니다.' })
+      body: JSON.stringify({ 
+        error: '서버 오류가 발생했습니다.',
+        details: error.message 
+      })
     };
   }
 }; 

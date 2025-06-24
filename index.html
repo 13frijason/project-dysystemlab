@@ -325,6 +325,8 @@
         async function handleEstimateSubmit(e) {
             e.preventDefault();
             
+            console.log('Form submitted');
+            
             const formData = new FormData(e.target);
             const data = {
                 name: formData.get('name'),
@@ -333,7 +335,10 @@
                 content: formData.get('content')
             };
             
+            console.log('Form data:', data);
+            
             try {
+                console.log('Sending request to:', '/.netlify/functions/submit-estimate');
                 const response = await fetch('/.netlify/functions/submit-estimate', {
                     method: 'POST',
                     headers: {
@@ -342,7 +347,11 @@
                     body: JSON.stringify(data)
                 });
                 
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
                 const result = await response.json();
+                console.log('Response body:', result);
                 
                 if (result.success) {
                     alert('견적문의가 성공적으로 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.');
@@ -351,8 +360,21 @@
                     throw new Error(result.error || '견적문의 접수에 실패했습니다.');
                 }
             } catch (error) {
-                alert('견적문의 접수 중 오류가 발생했습니다. 다시 시도해주세요.');
-                console.error('Error:', error);
+                console.error('Detailed error:', error);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                
+                let errorMessage = '견적문의 접수 중 오류가 발생했습니다. 다시 시도해주세요.';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = '네트워크 연결을 확인해주세요.';
+                } else if (error.message.includes('모든 필드를 입력해주세요')) {
+                    errorMessage = '모든 필드를 입력해주세요.';
+                } else if (error.details) {
+                    errorMessage = `오류: ${error.details}`;
+                }
+                
+                alert(errorMessage);
             }
         }
     </script>
