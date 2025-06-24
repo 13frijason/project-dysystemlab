@@ -5,19 +5,23 @@
   "main": "index.html",
   "scripts": {
     "dev": "netlify dev",
-    "build": "echo 'No build step required'",
+    "build": "echo 'Static site - no build required'",
     "deploy": "netlify deploy --prod"
   },
   "keywords": [
     "냉난방",
     "에어컨",
     "설비",
-    "견적"
+    "견적",
+    "static-site"
   ],
   "author": "도연시스템연구소",
   "license": "MIT",
   "devDependencies": {
     "netlify-cli": "^15.0.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "engines": {
+    "node": ">=16.0.0"
+  }
 } 

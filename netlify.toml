@@ -1,9 +1,12 @@
 [build]
   publish = "."
-  command = ""
+  command = "npm run build"
 
 [build.environment]
-  PYTHON_VERSION = "3.9"
+  NODE_VERSION = "18"
+
+[functions]
+  directory = "netlify/functions"
 
 [[redirects]]
   from = "/admin/*"
