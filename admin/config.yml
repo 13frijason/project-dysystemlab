@@ -1,0 +1,57 @@
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+
+media_folder: "static/uploads"
+public_folder: "/static/uploads"
+
+collections:
+  - name: "estimates"
+    label: "견적문의"
+    folder: "content/estimates"
+    create: false
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "작성자", name: "name", widget: "string"}
+      - {label: "연락처", name: "phone", widget: "string"}
+      - {label: "서비스 종류", name: "service_type", widget: "select", options: ["에어컨 설치", "냉난방 시스템", "환기 시스템", "기타"]}
+      - {label: "내용", name: "content", widget: "text"}
+      - {label: "상태", name: "status", widget: "select", options: ["대기중", "검토중", "견적완료", "완료"]}
+      - {label: "작성일", name: "created_at", widget: "datetime"}
+
+  - name: "construction"
+    label: "시공사례"
+    folder: "content/construction"
+    create: true
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "내용", name: "content", widget: "markdown"}
+      - {label: "이미지", name: "image", widget: "image", required: false}
+      - {label: "작성일", name: "created_at", widget: "datetime", format: "YYYY-MM-DD HH:mm:ss"}
+      - {label: "수정일", name: "updated_at", widget: "datetime", format: "YYYY-MM-DD HH:mm:ss"}
+
+  - name: "pages"
+    label: "페이지"
+    files:
+      - file: "index.html"
+        label: "메인 페이지"
+        name: "main"
+        fields:
+          - {label: "회사명", name: "company_name", widget: "string"}
+          - {label: "회사 소개", name: "about_content", widget: "markdown"}
+          - {label: "연락처", name: "contact_phone", widget: "string"}
+          - {label: "이메일", name: "contact_email", widget: "string"}
+
+  - name: "posts"
+    label: "공지사항"
+    folder: "_posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "내용", name: "body", widget: "markdown"}
+      - {label: "카테고리", name: "category", widget: "select", options: ["공지사항", "뉴스", "이벤트"]}
+      - {label: "썸네일", name: "thumbnail", widget: "image", required: false} 

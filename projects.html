@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시공사례 - 도연시스템연구소</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lightgallery.css">
+    <style>
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .project-info {
+            padding: 1.5rem;
+        }
+
+        .project-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .project-description {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .project-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .project-link:hover {
+            background: #0056b3;
+        }
+
+        .gallery-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+        }
+
+        .gallery-content {
+            position: relative;
+            width: 90%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+        }
+
+        .gallery-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .gallery-item {
+            cursor: pointer;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html">도연시스템연구소</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">홈</a></li>
+                <li><a href="projects.html" class="active">시공사례</a></li>
+                <li><a href="about.html">회사소개</a></li>
+                <li><a href="contact.html">문의하기</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="projects-section">
+            <h1>시공사례</h1>
+            <div class="projects-grid" id="projectsGrid"></div>
+        </section>
+    </main>
+
+    <div id="galleryContainer" class="gallery-container">
+        <div class="gallery-content">
+            <span class="gallery-close" onclick="closeGallery()">&times;</span>
+            <h2 id="galleryTitle"></h2>
+            <div class="gallery-grid" id="galleryGrid"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>도연시스템연구소</h3>
+                <p>주소: 서울특별시 강남구 테헤란로 123</p>
+                <p>전화: 02-123-4567</p>
+                <p>이메일: info@doyeon.co.kr</p>
+            </div>
+            <div class="footer-links">
+                <h3>바로가기</h3>
+                <ul>
+                    <li><a href="index.html">홈</a></li>
+                    <li><a href="projects.html">시공사례</a></li>
+                    <li><a href="about.html">회사소개</a></li>
+                    <li><a href="contact.html">문의하기</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 도연시스템연구소. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/lightgallery.min.js"></script>
+    <script>
+        async function loadProjects() {
+            try {
+                const response = await fetch('/_projects');
+                const projects = await response.json();
+                const projectsGrid = document.getElementById('projectsGrid');
+                
+                projects.forEach(project => {
+                    const projectCard = document.createElement('div');
+                    projectCard.className = 'project-card';
+                    projectCard.innerHTML = `
+                        <img src="${project.featured_image}" alt="${project.title}" class="project-image">
+                        <div class="project-info">
+                            <h3 class="project-title">${project.title}</h3>
+                            <p class="project-description">${project.description}</p>
+                            <div class="project-meta">
+                                <span>${project.category}</span>
+                                <span>${project.date}</span>
+                            </div>
+                            <a href="#" class="project-link" onclick="openGallery('${project.slug}')">갤러리 보기</a>
+                        </div>
+                    `;
+                    projectsGrid.appendChild(projectCard);
+                });
+            } catch (error) {
+                console.error('프로젝트 로딩 실패:', error);
+            }
+        }
+
+        function openGallery(slug) {
+            const galleryContainer = document.getElementById('galleryContainer');
+            const galleryTitle = document.getElementById('galleryTitle');
+            const galleryGrid = document.getElementById('galleryGrid');
+            
+            // 프로젝트 데이터 가져오기
+            fetch(`/_projects/${slug}.json`)
+                .then(response => response.json())
+                .then(project => {
+                    galleryTitle.textContent = project.title;
+                    galleryGrid.innerHTML = '';
+                    
+                    // 대표 이미지 추가
+                    const featuredItem = document.createElement('div');
+                    featuredItem.className = 'gallery-item';
+                    featuredItem.innerHTML = `<img src="${project.featured_image}" alt="대표 이미지">`;
+                    galleryGrid.appendChild(featuredItem);
+                    
+                    // 갤러리 이미지 추가
+                    project.gallery.forEach(image => {
+                        const item = document.createElement('div');
+                        item.className = 'gallery-item';
+                        item.innerHTML = `<img src="${image.image}" alt="갤러리 이미지">`;
+                        galleryGrid.appendChild(item);
+                    });
+                    
+                    galleryContainer.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('갤러리 로딩 실패:', error);
+                });
+        }
+
+        function closeGallery() {
+            document.getElementById('galleryContainer').style.display = 'none';
+        }
+
+        // 페이지 로드 시 프로젝트 로드
+        document.addEventListener('DOMContentLoaded', loadProjects);
+    </script>
+</body>
+</html> 

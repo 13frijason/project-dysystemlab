@@ -2,25 +2,31 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from models import db, Construction
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///estimates.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+# SQLAlchemy 초기화
 db = SQLAlchemy(app)
 
-class Admin(db.Model):
+# Construction 모델 정의
+class Construction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password_hash = db.Column(db.String(120), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    image_path = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+# 데이터베이스 초기화
+with app.app_context():
+    db.create_all()
 
 class Estimate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,26 +61,15 @@ def init_db():
     with app.app_context():
         db.create_all()
         
-        # 관리자 계정 생성
-        admin = Admin.query.filter_by(username='admin').first()
-        if not admin:
-            admin = Admin(username='admin')
-            admin.set_password('ehdusdl1!')
-            db.session.add(admin)
-            db.session.commit()
-            print("관리자 계정이 생성되었습니다.")
-        else:
-            admin.set_password('ehdusdl1!')
-            db.session.commit()
-            print("관리자 계정이 업데이트되었습니다.")
-        
         print("데이터베이스가 성공적으로 초기화되었습니다.")
 
 init_db()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # 최신 시공사진 6개 가져오기
+    latest_construction = Construction.query.order_by(Construction.created_at.desc()).limit(6).all()
+    return render_template('index.html', latest_construction=latest_construction)
 
 @app.route('/submit_estimate', methods=['POST'])
 def submit_estimate():
@@ -125,11 +120,11 @@ def board():
     page = request.args.get('page', 1, type=int)
     estimates = Estimate.query.order_by(Estimate.created_at.desc()).paginate(page=page, per_page=10)
     
-    # 로그인하지 않은 경우 이름과 연락처를 마스킹
-    if not session.get('admin_logged_in'):
-        for estimate in estimates.items:
-            estimate.name = mask_name(estimate.name)
-            estimate.phone = mask_phone(estimate.phone)
+    # Netlify Identity 토큰을 확인하여 로그인 상태 체크
+    # 프론트엔드에서 처리하므로 여기서는 항상 마스킹 처리
+    for estimate in estimates.items:
+        estimate.name = mask_name(estimate.name)
+        estimate.phone = mask_phone(estimate.phone)
     
     return render_template('board.html', estimates=estimates)
 
@@ -137,10 +132,10 @@ def board():
 def view(id):
     estimate = Estimate.query.get_or_404(id)
     
-    # 로그인하지 않은 경우 이름과 연락처를 마스킹
-    if not session.get('admin_logged_in'):
-        estimate.name = mask_name(estimate.name)
-        estimate.phone = mask_phone(estimate.phone)
+    # Netlify Identity 토큰을 확인하여 로그인 상태 체크
+    # 프론트엔드에서 처리하므로 여기서는 항상 마스킹 처리
+    estimate.name = mask_name(estimate.name)
+    estimate.phone = mask_phone(estimate.phone)
     
     return render_template('view.html', estimate=estimate)
 
@@ -165,28 +160,77 @@ def delete_estimate(id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
-        admin = Admin.query.filter_by(username=username).first()
-        
-        if admin and admin.check_password(password):
-            session['admin_logged_in'] = True
-            flash('로그인되었습니다.', 'success')
-            return redirect(url_for('board'))
-        else:
-            flash('아이디 또는 비밀번호가 올바르지 않습니다.', 'error')
-    
-    return render_template('login.html')
+@app.route('/construction')
+def construction_board():
+    posts = Construction.query.order_by(Construction.created_at.desc()).all()
+    return render_template('construction.html', posts=posts)
 
-@app.route('/logout')
-def logout():
-    session.pop('admin_logged_in', None)
-    flash('로그아웃되었습니다.', 'success')
-    return redirect(url_for('board'))
+@app.route('/construction/new', methods=['GET', 'POST'])
+def new_construction():
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        image = request.files.get('image')
+        
+        image_path = None
+        if image and image.filename:
+            filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{image.filename}"
+            image_path = os.path.join('uploads', filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        post = Construction(title=title, content=content, image_path=image_path)
+        db.session.add(post)
+        db.session.commit()
+        
+        flash('게시글이 성공적으로 작성되었습니다.', 'success')
+        return redirect(url_for('construction_board'))
+    
+    return render_template('construction_form.html')
+
+@app.route('/construction/<int:id>/edit', methods=['GET', 'POST'])
+def edit_construction(id):
+    post = Construction.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        post.title = request.form['title']
+        post.content = request.form['content']
+        
+        image = request.files.get('image')
+        if image and image.filename:
+            # 기존 이미지 삭제
+            if post.image_path:
+                old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(post.image_path))
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
+            
+            # 새 이미지 저장
+            filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{image.filename}"
+            post.image_path = os.path.join('uploads', filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        db.session.commit()
+        flash('게시글이 성공적으로 수정되었습니다.', 'success')
+        return redirect(url_for('construction_board'))
+    
+    return render_template('construction_edit.html', post=post)
+
+@app.route('/construction/<int:id>/delete')
+def delete_construction(id):
+    post = Construction.query.get_or_404(id)
+    
+    # 이미지 파일 삭제
+    if post.image_path:
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(post.image_path))
+        if os.path.exists(image_path):
+            os.remove(image_path)
+    
+    db.session.delete(post)
+    db.session.commit()
+    flash('게시글이 성공적으로 삭제되었습니다.', 'success')
+    return redirect(url_for('construction_board'))
 
 if __name__ == '__main__':
+    # uploads 폴더가 없으면 생성
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'])
     app.run(host='0.0.0.0', port=8080, debug=True) 

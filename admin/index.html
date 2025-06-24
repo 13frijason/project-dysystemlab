@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 - 도연시스템연구소</title>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .admin-header {
+            background-color: #fff;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-header h1 {
+            margin: 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .admin-header img {
+            height: 32px;
+        }
+        .logout-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+        #nc-root {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h1>
+            <img src="/static/company_logo.png" alt="로고">
+            도연시스템연구소 관리자 페이지
+        </h1>
+        <button class="logout-button" onclick="handleLogout()">로그아웃</button>
+    </div>
+    <div id="nc-root"></div>
+
+    <script>
+        // 인증 체크
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                if (!user) {
+                    window.location.href = "/login.html";
+                }
+            });
+        }
+
+        // 로그아웃 처리
+        function handleLogout() {
+            if (window.netlifyIdentity) {
+                window.netlifyIdentity.logout();
+                window.location.href = "/login.html";
+            }
+        }
+    </script>
+</body>
+</html> 

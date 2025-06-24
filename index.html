@@ -7,20 +7,26 @@
     <link rel="stylesheet" href="static/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
     <header>
         <nav>
-            <div class="logo">
-                <i class="fas fa-snowflake"></i>
-                도연시스템연구소
+            <div class="logo" style="display:flex; align-items:center; gap:8px;">
+                <img src="static/company_logo.png" alt="로고" style="height:32px;">
+                DYsystemlab
             </div>
             <ul>
                 <li><a href="#home">홈</a></li>
                 <li><a href="#services">서비스</a></li>
+                <li><a href="#construction">시공사진</a></li>
                 <li><a href="#about">회사소개</a></li>
-                <li><a href="board.html">견적문의</a></li>
                 <li><a href="#contact">연락처</a></li>
+                <li id="login-status">
+                    <a href="#" id="login-button" class="login-button" style="display: none;">로그인</a>
+                    <a href="#" id="logout-button" class="login-button" style="display: none;">로그아웃</a>
+                    <a href="/admin/" id="admin-link" class="admin-button" style="display: none;">관리자</a>
+                </li>
             </ul>
         </nav>
     </header>
@@ -29,7 +35,6 @@
         <div class="hero-content">
             <h1>최고의 냉난방 설비 솔루션</h1>
             <p>전문적인 기술력과 20년 이상의 경험으로 최적의 냉난방 시스템을 제공합니다.</p>
-            <a href="#estimate" class="cta-button">견적문의 하기</a>
         </div>
     </section>
 
@@ -56,6 +61,29 @@
         </div>
     </section>
 
+    <section id="construction" class="construction-section" style="padding-top: 50px;">
+        <div class="section-container">
+            <h2 class="section-title" style="margin-bottom: 2rem; margin-top: -50px;">시공사진</h2>
+            <div class="construction-slider">
+                <div class="slider-container">
+                    <div class="slider-track" id="projects-container">
+                        <!-- 프로젝트가 여기에 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+                <div class="slide-nav">
+                    <button class="nav-btn prev-btn"></button>
+                    <button class="nav-btn next-btn"></button>
+                </div>
+                <div class="nav-dots"></div>
+                <div class="more-button-container">
+                    <a href="construction.html" class="more-button">
+                        더보기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="about" class="about-section">
         <div class="section-container">
             <h2 class="section-title">회사 소개</h2>
@@ -72,43 +100,6 @@
                         <li><i class="fas fa-check"></i> 합리적인 가격</li>
                     </ul>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="estimate" class="estimate-section">
-        <div class="section-container">
-            <h2 class="section-title">견적문의</h2>
-            <div class="estimate-container">
-                <form class="estimate-form" action="/submit_estimate" method="POST">
-                    <div class="form-group">
-                        <label for="name">이름 *</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">연락처 *</label>
-                        <input type="tel" id="phone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="address">설치주소 *</label>
-                        <input type="text" id="address" name="address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="service_type">문의 서비스 *</label>
-                        <select id="service_type" name="service_type" required>
-                            <option value="">선택해주세요</option>
-                            <option value="에어컨 설치">에어컨 설치</option>
-                            <option value="정기 점검">정기 점검</option>
-                            <option value="수리 서비스">수리 서비스</option>
-                            <option value="기타">기타</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">상세 내용 *</label>
-                        <textarea id="message" name="message" rows="5" required></textarea>
-                    </div>
-                    <button type="submit" class="submit-button">견적문의 보내기</button>
-                </form>
             </div>
         </div>
     </section>
@@ -139,7 +130,7 @@
     <footer>
         <div class="footer-content">
             <div class="footer-info">
-                <h3><i class="fas fa-snowflake"></i> 도연시스템연구소</h3>
+                <h3><img src="static/company_logo.png" alt="로고" style="height:24px;vertical-align:middle;margin-right:8px;"> 도연시스템연구소</h3>
                 <p>최고의 전문성과 서비스로 고객님께 만족을 드리겠습니다.</p>
             </div>
             <div class="footer-contact">
@@ -152,6 +143,120 @@
         </div>
     </footer>
 
-    <script src="static/js/script.js"></script>
+    <script>
+        // Netlify Identity 초기화
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                updateLoginStatus(user);
+            });
+            
+            window.netlifyIdentity.on("login", user => {
+                updateLoginStatus(user);
+            });
+            
+            window.netlifyIdentity.on("logout", () => {
+                updateLoginStatus(null);
+            });
+        }
+
+        function updateLoginStatus(user) {
+            const loginButton = document.getElementById('login-button');
+            const logoutButton = document.getElementById('logout-button');
+            const adminLink = document.getElementById('admin-link');
+            
+            if (user) {
+                loginButton.style.display = 'none';
+                logoutButton.style.display = 'inline-block';
+                adminLink.style.display = 'inline-block';
+                logoutButton.onclick = () => {
+                    window.netlifyIdentity.logout();
+                };
+            } else {
+                loginButton.style.display = 'inline-block';
+                logoutButton.style.display = 'none';
+                adminLink.style.display = 'none';
+                loginButton.onclick = () => {
+                    window.netlifyIdentity.open();
+                };
+            }
+        }
+
+        // 시공사례 데이터 로드
+        async function loadProjects() {
+            try {
+                const response = await fetch('/_projects');
+                const projects = await response.json();
+                const container = document.getElementById('projects-container');
+                
+                projects.forEach(project => {
+                    const slide = document.createElement('div');
+                    slide.className = 'slide';
+                    slide.innerHTML = `
+                        <img src="${project.thumbnail}" alt="${project.title}">
+                        <div class="slide-info">
+                            <h3>${project.title}</h3>
+                            <p>${project.description}</p>
+                        </div>
+                    `;
+                    container.appendChild(slide);
+                });
+
+                // 슬라이더 초기화
+                initSlider();
+            } catch (error) {
+                console.error('시공사례를 불러오는데 실패했습니다:', error);
+            }
+        }
+
+        // 슬라이더 초기화
+        function initSlider() {
+            const track = document.querySelector('.slider-track');
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            const dotsContainer = document.querySelector('.nav-dots');
+            
+            let currentIndex = 0;
+            const slideWidth = slides[0].offsetWidth;
+            
+            // 도트 생성
+            slides.forEach((_, index) => {
+                const dot = document.createElement('button');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(index));
+                dotsContainer.appendChild(dot);
+            });
+            
+            function goToSlide(index) {
+                currentIndex = index;
+                track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+                updateDots();
+            }
+            
+            function updateDots() {
+                document.querySelectorAll('.dot').forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+            
+            prevBtn.addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    goToSlide(currentIndex - 1);
+                }
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                if (currentIndex < slides.length - 1) {
+                    goToSlide(currentIndex + 1);
+                }
+            });
+        }
+
+        // 페이지 로드 시 데이터 로드
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProjects();
+        });
+    </script>
 </body>
 </html> 

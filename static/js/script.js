@@ -59,8 +59,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const targetId = this.getAttribute('href');
                 const targetSection = document.querySelector(targetId);
                 if (targetSection) {
+                    const offset = targetId === '#construction' ? 100 : 80;
                     window.scrollTo({
-                        top: targetSection.offsetTop - 80,
+                        top: targetSection.offsetTop - offset,
                         behavior: 'smooth'
                     });
                 }
@@ -162,4 +163,111 @@ document.addEventListener('DOMContentLoaded', function() {
             window.history.back();
         });
     }
+
+    // 슬라이더 기능
+    const sliderTrack = document.querySelector('.slider-track');
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    const navDots = document.querySelector('.nav-dots');
+    
+    let currentIndex = 0;
+    let slideWidth = slides[0].clientWidth;
+    let autoSlideInterval;
+    
+    // 도트 네비게이션 생성
+    slides.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (index === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(index));
+        navDots.appendChild(dot);
+    });
+    
+    const dots = document.querySelectorAll('.dot');
+    
+    function updateDots() {
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentIndex);
+        });
+    }
+    
+    function goToSlide(index) {
+        currentIndex = index;
+        sliderTrack.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+        updateDots();
+    }
+    
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % slides.length;
+        goToSlide(currentIndex);
+    }
+    
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        goToSlide(currentIndex);
+    }
+    
+    // 자동 슬라이드 시작
+    function startAutoSlide() {
+        autoSlideInterval = setInterval(nextSlide, 5000);
+    }
+    
+    // 자동 슬라이드 정지
+    function stopAutoSlide() {
+        clearInterval(autoSlideInterval);
+    }
+    
+    // 이벤트 리스너
+    prevBtn.addEventListener('click', () => {
+        prevSlide();
+        stopAutoSlide();
+        startAutoSlide();
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        nextSlide();
+        stopAutoSlide();
+        startAutoSlide();
+    });
+    
+    // 터치 이벤트 처리
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    sliderTrack.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        stopAutoSlide();
+    });
+    
+    sliderTrack.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].clientX;
+        handleSwipe();
+        startAutoSlide();
+    });
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+        }
+    }
+    
+    // 반응형 대응
+    function updateSlideWidth() {
+        slideWidth = slides[0].clientWidth;
+        goToSlide(currentIndex);
+    }
+    
+    window.addEventListener('resize', updateSlideWidth);
+    
+    // 초기화
+    updateSlideWidth();
+    startAutoSlide();
 }); 

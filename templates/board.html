@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
         .delete-button {
             background-color: #ff4444;
@@ -57,21 +58,20 @@
 <body>
     <header>
         <nav>
-            <div class="logo">
-                <i class="fas fa-snowflake"></i>
+            <div class="logo" style="display:flex; align-items:center; gap:8px;">
+                <img src="{{ url_for('static', filename='company_logo.png') }}" alt="로고" style="height:32px;">
                 도연시스템연구소
             </div>
             <ul>
                 <li><a href="{{ url_for('index') }}">홈</a></li>
                 <li><a href="{{ url_for('index') }}#services">서비스</a></li>
                 <li><a href="{{ url_for('index') }}#about">회사소개</a></li>
-                <li><a href="{{ url_for('board') }}">견적문의</a></li>
+                <!-- <li><a href="{{ url_for('board') }}">견적문의</a></li> -->
                 <li><a href="{{ url_for('index') }}#contact">연락처</a></li>
-                {% if session.get('admin_logged_in') %}
-                <li><a href="{{ url_for('logout') }}" class="login-button">로그아웃</a></li>
-                {% else %}
-                <li><a href="{{ url_for('login') }}" class="login-button">로그인</a></li>
-                {% endif %}
+                <li id="login-status">
+                    <a href="#" id="login-button" class="login-button" style="display: none;">로그인</a>
+                    <a href="#" id="logout-button" class="login-button" style="display: none;">로그아웃</a>
+                </li>
             </ul>
         </nav>
     </header>
@@ -99,70 +99,60 @@
             {% endif %}
         {% endwith %}
 
-        {% if estimates.items %}
-        <table class="board-table">
-            <thead>
-                <tr>
-                    <th>번호</th>
-                    <th>이름</th>
-                    <th>연락처</th>
-                    <th>서비스 종류</th>
-                    <th>작성일</th>
-                    <th>상태</th>
-                    <th>관리</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for estimate in estimates.items %}
-                <tr>
-                    <td>{{ estimate.id }}</td>
-                    <td>{{ estimate.name }}</td>
-                    <td>{{ estimate.phone }}</td>
-                    <td>{{ estimate.service_type }}</td>
-                    <td>{{ estimate.created_at.strftime('%Y-%m-%d') }}</td>
-                    <td>
-                        <span class="status-{{ 'completed' if estimate.status == '완료' else 'pending' }}">
-                            {{ estimate.status }}
-                        </span>
-                    </td>
-                    <td>
-                        {% if session.get('admin_logged_in') %}
-                        <button class="delete-button" onclick="deleteEstimate({{ estimate.id }})">
-                            <i class="fas fa-trash"></i> 삭제
-                        </button>
+        <div class="board-content">
+            {% if estimates.items %}
+                <div class="estimates-list">
+                    {% for estimate in estimates.items %}
+                        <div class="estimate-item" data-id="{{ estimate.id }}">
+                            <div class="estimate-header">
+                                <h3 class="estimate-title">{{ estimate.title }}</h3>
+                                <span class="estimate-date">{{ estimate.created_at.strftime('%Y-%m-%d') }}</span>
+                            </div>
+                            <div class="estimate-info">
+                                <p class="estimate-name">작성자: <span class="name-text">{{ estimate.name }}</span></p>
+                                <p class="estimate-phone">연락처: <span class="phone-text">{{ estimate.phone }}</span></p>
+                            </div>
+                            <div class="estimate-content">
+                                <p>{{ estimate.content[:100] }}{% if estimate.content|length > 100 %}...{% endif %}</p>
+                            </div>
+                            <div class="estimate-actions">
+                                <a href="{{ url_for('view', id=estimate.id) }}" class="view-button">상세보기</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- 페이지네이션 -->
+                {% if estimates.pages > 1 %}
+                    <div class="pagination">
+                        {% if estimates.has_prev %}
+                            <a href="{{ url_for('board', page=estimates.prev_num) }}" class="page-link">&laquo; 이전</a>
                         {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="board-pagination">
-            {% if estimates.has_prev %}
-                <a href="{{ url_for('board', page=estimates.prev_num) }}" class="page-button">&laquo; 이전</a>
-            {% endif %}
-            
-            {% for page_num in estimates.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
-                {% if page_num %}
-                    <a href="{{ url_for('board', page=page_num) }}" 
-                       class="page-button {{ 'active' if page_num == estimates.page else '' }}">
-                        {{ page_num }}
-                    </a>
-                {% else %}
-                    <span class="page-button">...</span>
+                        
+                        {% for page_num in estimates.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num != estimates.page %}
+                                    <a href="{{ url_for('board', page=page_num) }}" class="page-link">{{ page_num }}</a>
+                                {% else %}
+                                    <span class="page-link current">{{ page_num }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="page-link">...</span>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if estimates.has_next %}
+                            <a href="{{ url_for('board', page=estimates.next_num) }}" class="page-link">다음 &raquo;</a>
+                        {% endif %}
+                    </div>
                 {% endif %}
-            {% endfor %}
-
-            {% if estimates.has_next %}
-                <a href="{{ url_for('board', page=estimates.next_num) }}" class="page-button">다음 &raquo;</a>
+            {% else %}
+                <div class="no-estimates">
+                    <p>아직 견적문의가 없습니다.</p>
+                    <a href="{{ url_for('index') }}#estimate" class="write-button">첫 번째 견적문의 작성하기</a>
+                </div>
             {% endif %}
         </div>
-        {% else %}
-        <div class="no-posts">
-            <i class="fas fa-inbox"></i>
-            아직 등록된 견적문의가 없습니다.
-        </div>
-        {% endif %}
     </div>
 
     <footer>
@@ -182,25 +172,70 @@
     </footer>
 
     <script>
-    function deleteEstimate(id) {
-        if (confirm('정말로 이 견적문의를 삭제하시겠습니까?')) {
-            fetch(`/api/estimates/${id}`, {
-                method: 'DELETE',
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('견적문의가 삭제되었습니다.');
-                    location.reload();
-                } else {
-                    throw new Error('삭제 실패');
-                }
-            })
-            .catch(error => {
-                alert('견적문의 삭제 중 오류가 발생했습니다.');
-                console.error('Error:', error);
+        // Netlify Identity 초기화
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                updateLoginStatus(user);
+            });
+            
+            window.netlifyIdentity.on("login", user => {
+                updateLoginStatus(user);
+                // 로그인 후 개인정보 표시
+                showPersonalInfo();
+            });
+            
+            window.netlifyIdentity.on("logout", () => {
+                updateLoginStatus(null);
+                // 로그아웃 후 개인정보 마스킹
+                hidePersonalInfo();
             });
         }
-    }
+
+        function updateLoginStatus(user) {
+            const loginButton = document.getElementById('login-button');
+            const logoutButton = document.getElementById('logout-button');
+            
+            if (user) {
+                loginButton.style.display = 'none';
+                logoutButton.style.display = 'inline-block';
+                logoutButton.onclick = () => {
+                    window.netlifyIdentity.logout();
+                };
+            } else {
+                loginButton.style.display = 'inline-block';
+                logoutButton.style.display = 'none';
+                loginButton.onclick = () => {
+                    window.netlifyIdentity.open();
+                };
+            }
+        }
+
+        function showPersonalInfo() {
+            // 로그인된 사용자에게만 개인정보 표시
+            const nameElements = document.querySelectorAll('.name-text');
+            const phoneElements = document.querySelectorAll('.phone-text');
+            
+            // 실제 데이터는 서버에서 가져와야 하지만, 여기서는 예시로 표시
+            nameElements.forEach(el => {
+                el.textContent = el.textContent.replace(/\*+/g, '김***');
+            });
+            phoneElements.forEach(el => {
+                el.textContent = el.textContent.replace(/\*+/g, '010-****-****');
+            });
+        }
+
+        function hidePersonalInfo() {
+            // 로그아웃 시 개인정보 마스킹
+            const nameElements = document.querySelectorAll('.name-text');
+            const phoneElements = document.querySelectorAll('.phone-text');
+            
+            nameElements.forEach(el => {
+                el.textContent = el.textContent.replace(/[가-힣]/g, '*');
+            });
+            phoneElements.forEach(el => {
+                el.textContent = el.textContent.replace(/\d/g, '*');
+            });
+        }
     </script>
 </body>
 </html> 
