@@ -687,28 +687,17 @@
             return date.toLocaleDateString('ko-KR');
         }
 
-        // 페이지 로드 시 견적문의 로드
+        // 페이지 로드 시 로그인 상태 확인 및 견적문의 로드
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM loaded, checking login status');
-            // 로그인 상태 확인
             if (window.netlifyIdentity && window.netlifyIdentity.currentUser()) {
-                currentUser = window.netlifyIdentity.currentUser();
-                updateLoginStatus(currentUser);
+                updateLoginStatus(window.netlifyIdentity.currentUser());
             } else {
-                // 로그인되지 않은 경우 로그인 버튼 표시
+                // 로컬 테스트 모드에서는 기본적으로 로그인되지 않은 상태
                 updateLoginStatus(null);
-                
-                // 로컬 테스트를 위해 3초 후 자동 로그인 (선택사항)
-                setTimeout(() => {
-                    console.log('Auto-login for local testing');
-                    if (!currentUser) {
-                        currentUser = { email: 'admin@test.com', name: '관리자' };
-                        updateLoginStatus(currentUser);
-                        loadEstimates();
-                        alert('로컬 테스트 모드: 자동으로 관리자로 로그인되었습니다.');
-                    }
-                }, 3000);
             }
+            
+            // 견적문의 목록 로드
             loadEstimates();
         });
     </script>

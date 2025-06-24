@@ -301,13 +301,6 @@
             } else {
                 // 로컬 테스트 모드에서는 기본적으로 로그인되지 않은 상태
                 updateLoginStatus(null);
-                
-                // 로컬 테스트를 위해 3초 후 자동 로그인 (선택사항)
-                setTimeout(() => {
-                    console.log('Auto-login for local testing');
-                    updateLoginStatus({ email: 'admin@test.com', name: '관리자' });
-                    alert('로컬 테스트 모드: 자동으로 관리자로 로그인되었습니다.');
-                }, 3000);
             }
             
             // 오늘 날짜를 기본값으로 설정
