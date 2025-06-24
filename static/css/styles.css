@@ -455,84 +455,156 @@ nav a:hover {
 
 /* Estimate Section */
 .estimate-section {
-    background-color: var(--light-gray);
+    background-color: #f8f9fa;
+    padding: 4rem 0;
 }
 
 .estimate-container {
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: var(--white);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 2rem;
+}
+
+.estimate-info h3 {
+    font-size: 1.8rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.estimate-info p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.estimate-features {
+    list-style: none;
+    padding: 0;
+}
+
+.estimate-features li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    color: var(--text-color);
+}
+
+.estimate-features i {
+    color: var(--primary-color);
+    margin-right: 0.8rem;
+    font-size: 1.1rem;
 }
 
 .estimate-form {
-    display: grid;
-    gap: 1.5rem;
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+.estimate-form .form-group {
+    margin-bottom: 1.5rem;
 }
 
-.form-group label {
+.estimate-form label {
+    display: block;
+    margin-bottom: 0.5rem;
     font-weight: 500;
     color: var(--text-color);
 }
 
-.form-group label::after {
-    content: '*';
-    color: #ff4444;
-    margin-left: 0.3rem;
-}
-
-.form-group label:not([for="email"])::after {
-    content: '*';
-    color: #ff4444;
-    margin-left: 0.3rem;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
+.estimate-form input,
+.estimate-form select,
+.estimate-form textarea {
+    width: 100%;
     padding: 0.8rem;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 4px;
     font-size: 1rem;
     transition: border-color 0.3s;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.estimate-form input:focus,
+.estimate-form select:focus,
+.estimate-form textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
 }
 
-.form-group textarea {
+.estimate-form textarea {
     resize: vertical;
-    min-height: 150px;
+    min-height: 120px;
 }
 
-button.submit-button {
+.submit-button {
     background-color: var(--primary-color);
     color: var(--white);
-    padding: 1rem;
+    padding: 1rem 2rem;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s;
-    margin-top: 1rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-button.submit-button:hover {
+.submit-button:hover {
     background-color: var(--secondary-color);
+}
+
+.estimate-board-link {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.estimate-board-link p {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
+
+.board-link-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--white);
+    color: var(--primary-color);
+    padding: 0.8rem 1.5rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.board-link-button:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+/* Responsive Design for Estimate Section */
+@media (max-width: 768px) {
+    .estimate-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .estimate-info h3 {
+        font-size: 1.5rem;
+    }
+    
+    .estimate-form {
+        padding: 1.5rem;
+    }
+    
+    .submit-button {
+        padding: 0.8rem 1.5rem;
+    }
 }
 
 /* Footer */
