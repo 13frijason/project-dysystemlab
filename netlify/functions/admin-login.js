@@ -79,7 +79,7 @@ exports.handler = async (event, context) => {
 
     console.log('Login successful for admin:', username);
 
-    // 성공 응답 (JWT 토큰 대신 간단한 세션 정보)
+    // 성공 응답
     return {
       statusCode: 200,
       headers,
