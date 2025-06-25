@@ -21,7 +21,8 @@
     "netlify-cli": "^15.0.0"
   },
   "dependencies": {
-    "mongodb": "^6.3.0"
+    "mongodb": "^6.3.0",
+    "@supabase/supabase-js": "^2.38.0"
   },
   "engines": {
     "node": ">=16.0.0"

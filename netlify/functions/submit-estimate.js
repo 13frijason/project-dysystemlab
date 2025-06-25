@@ -1,5 +1,9 @@
-const fs = require('fs').promises;
-const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
+
+// Supabase 클라이언트 초기화
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event, context) => {
   console.log('Function started:', event.httpMethod);
@@ -47,54 +51,30 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // 견적문의 데이터 생성
-    const estimate = {
-      id: Date.now().toString(),
-      title: `${data.service_type} 견적문의`,
-      name: data.name,
-      phone: data.phone,
-      service_type: data.service_type,
-      content: data.content,
-      status: '대기중',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      // 메타데이터 추가
-      ip_address: event.headers['client-ip'] || 'unknown',
-      user_agent: event.headers['user-agent'] || 'unknown'
-    };
+    // Supabase에 데이터 저장
+    const { data: estimate, error } = await supabase
+      .from('estimates')
+      .insert([
+        {
+          title: `${data.service_type} 견적문의`,
+          name: data.name,
+          phone: data.phone,
+          service_type: data.service_type,
+          content: data.content,
+          status: '대기중',
+          ip_address: event.headers['client-ip'] || 'unknown',
+          user_agent: event.headers['user-agent'] || 'unknown'
+        }
+      ])
+      .select()
+      .single();
 
-    console.log('Created estimate object:', estimate);
-
-    // 현재 작업 디렉토리 확인
-    const cwd = process.cwd();
-    console.log('Current working directory:', cwd);
-    
-    // 데이터를 JSON 파일로 저장 (상대 경로 사용)
-    const dataDir = path.join(cwd, 'content', 'estimates');
-    const filePath = path.join(dataDir, `${estimate.id}.json`);
-    
-    console.log('Data directory:', dataDir);
-    console.log('File path:', filePath);
-    
-    // 디렉토리가 없으면 생성
-    try {
-      console.log('Creating directory...');
-      await fs.mkdir(dataDir, { recursive: true });
-      console.log('Directory created successfully');
-    } catch (err) {
-      console.log('Directory creation error:', err.message);
-      // 디렉토리 생성 실패 시에도 계속 진행 (이미 존재할 수 있음)
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(`데이터베이스 저장 실패: ${error.message}`);
     }
 
-    // 파일에 데이터 저장
-    try {
-      console.log('Writing file...');
-      await fs.writeFile(filePath, JSON.stringify(estimate, null, 2), 'utf8');
-      console.log('File written successfully');
-    } catch (writeErr) {
-      console.error('File write error:', writeErr);
-      throw new Error(`파일 저장 실패: ${writeErr.message}`);
-    }
+    console.log('Successfully saved to Supabase:', estimate);
 
     // 성공 응답
     console.log('Sending success response');
