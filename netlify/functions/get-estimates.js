@@ -101,6 +101,8 @@ exports.handler = async (event, context) => {
           // 파일명을 ID로 사용 (확장자 포함)
           estimate.id = filename;
           
+          console.log(`Loaded estimate from file: ${filename}, ID: ${estimate.id}`);
+          
           return estimate;
         });
 

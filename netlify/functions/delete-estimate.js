@@ -45,6 +45,8 @@ exports.handler = async (event, context) => {
     const { id } = JSON.parse(event.body);
     
     console.log('Deleting estimate with ID:', id);
+    console.log('ID type:', typeof id);
+    console.log('ID length:', id.length);
     
     if (!id) {
       console.log('No ID provided');
@@ -79,6 +81,8 @@ exports.handler = async (event, context) => {
       }
       
       console.log('Estimate file path:', estimateFilePath);
+      console.log('File exists:', fs.existsSync(estimateFilePath));
+      console.log('Available files in directory:', fs.readdirSync(estimatesDir));
       
       if (fs.existsSync(estimateFilePath)) {
         fs.unlinkSync(estimateFilePath);

@@ -706,7 +706,11 @@
             }
 
             try {
+                console.log('=== DELETE ESTIMATE DEBUG ===');
                 console.log('Deleting estimate with ID:', id);
+                console.log('ID type:', typeof id);
+                console.log('ID length:', id.length);
+                console.log('Current user:', currentUser);
                 
                 let headers = {
                     'Content-Type': 'application/json'
@@ -718,10 +722,13 @@
                     headers['Authorization'] = `Bearer ${token}`;
                 }
 
+                const requestBody = JSON.stringify({ id });
+                console.log('Request body:', requestBody);
+
                 const response = await fetch('/.netlify/functions/delete-estimate', {
                     method: 'DELETE',
                     headers: headers,
-                    body: JSON.stringify({ id })
+                    body: requestBody
                 });
 
                 console.log('Delete response status:', response.status);
