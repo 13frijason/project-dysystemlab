@@ -273,11 +273,37 @@
             e.preventDefault();
             
             const formData = new FormData(this);
+            const title = formData.get('title');
+            const date = formData.get('date');
+            const description = formData.get('description');
+            const imageFile = formData.get('image');
+            
+            // 이미지를 base64로 변환
+            const imageData = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // base64 데이터에서 data:image/...;base64, 부분 제거
+                    const base64Data = e.target.result.split(',')[1];
+                    resolve(base64Data);
+                };
+                reader.readAsDataURL(imageFile);
+            });
+            
+            const jsonData = {
+                title: title,
+                date: date,
+                description: description,
+                imageData: imageData,
+                imageName: imageFile.name
+            };
             
             try {
                 const response = await fetch('/.netlify/functions/submit-construction', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
                 });
                 
                 if (response.ok) {

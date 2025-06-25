@@ -21,8 +21,7 @@
     "netlify-cli": "^15.0.0"
   },
   "dependencies": {
-    "mongodb": "^6.3.0",
-    "form-data": "^4.0.0"
+    "mongodb": "^6.3.0"
   },
   "engines": {
     "node": ">=16.0.0"

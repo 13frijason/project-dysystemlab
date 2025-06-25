@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const FormData = require('form-data');
 
 exports.handler = async (event, context) => {
     // CORS 헤더 설정
@@ -30,59 +29,11 @@ exports.handler = async (event, context) => {
     try {
         console.log('Received construction submission request');
         
-        // FormData 파싱
-        const formData = new FormData();
-        const boundary = event.headers['content-type'].split('boundary=')[1];
+        // JSON 데이터 파싱
+        const data = JSON.parse(event.body);
+        const { title, date, description, imageData, imageName } = data;
         
-        // multipart/form-data 파싱
-        const body = Buffer.from(event.body, 'base64');
-        const parts = body.toString().split(`--${boundary}`);
-        
-        let title, date, description, imageData, imageName;
-        
-        for (const part of parts) {
-            if (part.includes('Content-Disposition: form-data')) {
-                const lines = part.split('\r\n');
-                let fieldName = '';
-                let fieldValue = '';
-                let isFile = false;
-                
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    if (line.includes('Content-Disposition: form-data; name=')) {
-                        const nameMatch = line.match(/name="([^"]+)"/);
-                        if (nameMatch) {
-                            fieldName = nameMatch[1];
-                        }
-                        
-                        // 파일인지 확인
-                        if (line.includes('filename=')) {
-                            isFile = true;
-                            const filenameMatch = line.match(/filename="([^"]+)"/);
-                            if (filenameMatch) {
-                                imageName = filenameMatch[1];
-                            }
-                        }
-                    } else if (line === '' && i + 1 < lines.length) {
-                        // 빈 줄 다음부터가 실제 데이터
-                        fieldValue = lines.slice(i + 1).join('\r\n').trim();
-                        break;
-                    }
-                }
-                
-                if (fieldName === 'title') {
-                    title = fieldValue;
-                } else if (fieldName === 'date') {
-                    date = fieldValue;
-                } else if (fieldName === 'description') {
-                    description = fieldValue;
-                } else if (fieldName === 'image' && isFile) {
-                    imageData = fieldValue;
-                }
-            }
-        }
-        
-        console.log('Parsed form data:', { title, date, description, imageName });
+        console.log('Parsed form data:', { title, date, description, imageName: imageName || 'unknown' });
         
         // 필수 필드 검증
         if (!title || !date || !description || !imageData) {
