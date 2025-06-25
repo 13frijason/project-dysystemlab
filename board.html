@@ -388,6 +388,60 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
+        /* 반응형 네비게이션 */
+        @media (max-width: 768px) {
+            .navbar-nav {
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .navbar-nav .nav-item {
+                margin: 0.25rem 0;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .login-button, .admin-button {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.8rem;
+                margin: 0.25rem 0;
+                display: inline-block;
+            }
+            
+            .navbar-brand {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .navbar-toggler {
+                margin-bottom: 0.5rem;
+            }
+            
+            .navbar-collapse {
+                padding: 1rem 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-nav .nav-link {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.8rem;
+            }
+            
+            .login-button, .admin-button {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.4rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
