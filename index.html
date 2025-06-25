@@ -221,19 +221,30 @@
             const logoutButton = document.getElementById('logout-button');
             const adminLink = document.getElementById('admin-link');
             
-            if (user) {
+            // 로컬 스토리지에서 관리자 로그인 상태 확인
+            const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+            
+            if (adminLoggedIn && adminInfo.username) {
+                // 관리자 로그인 상태
                 loginButton.style.display = 'none';
                 logoutButton.style.display = 'inline-block';
                 adminLink.style.display = 'inline-block';
                 logoutButton.onclick = () => {
-                    window.netlifyIdentity.logout();
+                    // 로그아웃 처리
+                    localStorage.removeItem('adminLoggedIn');
+                    localStorage.removeItem('adminInfo');
+                    updateLoginStatus(null);
+                    alert('로그아웃되었습니다.');
                 };
             } else {
+                // 로그아웃 상태
                 loginButton.style.display = 'inline-block';
                 logoutButton.style.display = 'none';
                 adminLink.style.display = 'none';
                 loginButton.onclick = () => {
-                    window.netlifyIdentity.open();
+                    // 관리자 로그인 페이지로 이동
+                    window.location.href = 'admin-login.html';
                 };
             }
         }
