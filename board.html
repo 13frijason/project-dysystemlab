@@ -165,7 +165,7 @@
         }
 
         .write-button {
-            padding: 12px 24px;
+            padding: 10px 20px;
             background-color: var(--primary-color);
             color: var(--white);
             border: none;
@@ -175,6 +175,7 @@
             align-items: center;
             gap: 8px;
             font-weight: 500;
+            font-size: 0.9rem;
             transition: all 0.3s;
         }
 
@@ -188,18 +189,18 @@
         }
 
         .delete-button {
-            padding: 6px 12px;
-            background-color: #ff4444;
+            padding: 4px 8px;
+            background-color: #dc3545;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             transition: background-color 0.3s;
         }
 
         .delete-button:hover {
-            background-color: #cc0000;
+            background-color: #c82333;
         }
 
         .delete-button i {
@@ -223,27 +224,30 @@
         }
 
         .login-button {
-            background-color: #007bff;
+            background-color: #6c757d;
             color: white;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 4px;
             text-decoration: none;
             font-weight: 500;
+            font-size: 0.9rem;
             transition: background-color 0.3s;
         }
 
         .login-button:hover {
-            background-color: #0056b3;
+            background-color: #5a6268;
         }
 
         .admin-button {
             background-color: #28a745;
             color: white;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 4px;
             text-decoration: none;
             font-weight: 500;
+            font-size: 0.9rem;
             transition: background-color 0.3s;
+            display: inline-block;
         }
 
         .admin-button:hover {
@@ -491,39 +495,35 @@
             const logoutButton = document.getElementById('logout-button');
             const adminLink = document.getElementById('admin-link');
             
-            if (user) {
-                console.log('Setting logged in state');
+            // 로컬 스토리지에서 관리자 로그인 상태 확인
+            const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+            
+            if (adminLoggedIn && adminInfo.username) {
+                console.log('Setting admin logged in state');
+                currentUser = adminInfo;
                 loginButton.style.display = 'none';
                 logoutButton.style.display = 'inline-block';
                 adminLink.style.display = 'inline-block';
                 logoutButton.onclick = () => {
-                    if (window.netlifyIdentity) {
-                        window.netlifyIdentity.logout();
-                    } else {
-                        // 로컬 테스트용 로그아웃
-                        currentUser = null;
-                        updateLoginStatus(null);
-                        loadEstimates();
-                        alert('로컬 테스트 모드: 로그아웃되었습니다.');
-                    }
+                    // 로그아웃 처리
+                    localStorage.removeItem('adminLoggedIn');
+                    localStorage.removeItem('adminInfo');
+                    currentUser = null;
+                    updateLoginStatus(null);
+                    loadEstimates();
+                    alert('로그아웃되었습니다.');
                 };
             } else {
                 console.log('Setting logged out state');
+                currentUser = null;
                 loginButton.style.display = 'inline-block';
                 logoutButton.style.display = 'none';
                 adminLink.style.display = 'none';
                 loginButton.onclick = () => {
                     console.log('Login button clicked');
-                    if (window.netlifyIdentity) {
-                        window.netlifyIdentity.open();
-                    } else {
-                        // 로컬 테스트용 로그인 (관리자 모드 활성화)
-                        console.log('Local test login triggered');
-                        currentUser = { email: 'admin@test.com', name: '관리자' };
-                        updateLoginStatus(currentUser);
-                        loadEstimates();
-                        alert('로컬 테스트 모드: 관리자로 로그인되었습니다.');
-                    }
+                    // 관리자 로그인 페이지로 이동
+                    window.location.href = 'admin-login.html';
                 };
             }
         }
@@ -690,10 +690,14 @@
         // 페이지 로드 시 로그인 상태 확인 및 견적문의 로드
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM loaded, checking login status');
-            if (window.netlifyIdentity && window.netlifyIdentity.currentUser()) {
-                updateLoginStatus(window.netlifyIdentity.currentUser());
+            
+            // 로컬 스토리지에서 관리자 로그인 상태 확인
+            const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+            
+            if (adminLoggedIn && adminInfo.username) {
+                updateLoginStatus(adminInfo);
             } else {
-                // 로컬 테스트 모드에서는 기본적으로 로그인되지 않은 상태
                 updateLoginStatus(null);
             }
             
