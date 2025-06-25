@@ -71,7 +71,12 @@ exports.handler = async (event, context) => {
       
       // 파일 시스템에서 삭제
       const estimatesDir = path.join(process.cwd(), 'content', 'estimates');
-      const estimateFilePath = path.join(estimatesDir, `${id}.json`);
+      let estimateFilePath = path.join(estimatesDir, `${id}.json`);
+      
+      // ID가 이미 .json 확장자를 포함하고 있는지 확인
+      if (id.endsWith('.json')) {
+        estimateFilePath = path.join(estimatesDir, id);
+      }
       
       console.log('Estimate file path:', estimateFilePath);
       

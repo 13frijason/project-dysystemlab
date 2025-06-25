@@ -98,8 +98,8 @@ exports.handler = async (event, context) => {
           const fileContent = fs.readFileSync(filePath, 'utf8');
           const estimate = JSON.parse(fileContent);
           
-          // 파일명을 ID로 사용
-          estimate.id = filename.replace('.json', '');
+          // 파일명을 ID로 사용 (확장자 포함)
+          estimate.id = filename;
           
           return estimate;
         });
