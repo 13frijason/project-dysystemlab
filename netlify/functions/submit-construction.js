@@ -44,42 +44,28 @@ exports.handler = async (event, context) => {
             };
         }
         
-        // 이미지 저장
-        const imageId = Date.now().toString();
-        const imageExtension = path.extname(imageName || 'image.jpg');
-        const imageFileName = `construction_${imageId}${imageExtension}`;
-        const imagePath = path.join(process.cwd(), 'static', 'uploads', 'construction', imageFileName);
-        
-        // 디렉토리 생성
-        const uploadDir = path.dirname(imagePath);
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        
-        // 이미지 데이터 저장 (base64 디코딩)
-        const imageBuffer = Buffer.from(imageData, 'base64');
-        fs.writeFileSync(imagePath, imageBuffer);
-        
         // 게시물 데이터 생성
+        const postId = Date.now().toString();
         const postData = {
-            id: imageId,
+            id: postId,
             title: title,
             date: date,
             description: description,
-            imageUrl: `/static/uploads/construction/${imageFileName}`,
+            imageData: imageData, // base64 이미지 데이터 저장
+            imageName: imageName || 'image.jpg',
             createdAt: new Date().toISOString()
         };
         
-        // 게시물 데이터 저장
+        // 게시물 데이터 저장 (JSON 파일로)
         const postsDir = path.join(process.cwd(), 'content', 'construction');
         if (!fs.existsSync(postsDir)) {
             fs.mkdirSync(postsDir, { recursive: true });
         }
         
-        const postFilePath = path.join(postsDir, `${imageId}.json`);
+        const postFilePath = path.join(postsDir, `${postId}.json`);
         fs.writeFileSync(postFilePath, JSON.stringify(postData, null, 2));
         
-        console.log('Construction post saved:', postData);
+        console.log('Construction post saved:', { id: postData.id, title: postData.title });
         
         return {
             statusCode: 200,
@@ -96,7 +82,7 @@ exports.handler = async (event, context) => {
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: '게시물 등록 중 오류가 발생했습니다.' })
+            body: JSON.stringify({ error: '게시물 등록 중 오류가 발생했습니다: ' + error.message })
         };
     }
 }; 

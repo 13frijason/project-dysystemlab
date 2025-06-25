@@ -723,13 +723,16 @@
 
                 if (result.success) {
                     showFlashMessage('견적문의가 삭제되었습니다.', 'success');
-                    loadEstimates();
+                    // 삭제 후 즉시 목록 새로고침
+                    setTimeout(() => {
+                        loadEstimates();
+                    }, 500);
                 } else {
-                    throw new Error(result.error);
+                    throw new Error(result.error || '삭제 실패');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showFlashMessage('견적문의 삭제 중 오류가 발생했습니다.', 'error');
+                showFlashMessage('견적문의 삭제 중 오류가 발생했습니다: ' + error.message, 'error');
             }
         }
 

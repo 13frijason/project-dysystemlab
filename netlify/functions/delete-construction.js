@@ -63,14 +63,7 @@ exports.handler = async (event, context) => {
         fs.unlinkSync(postFilePath);
         console.log('Deleted post file:', postFilePath);
         
-        // 이미지 파일 삭제
-        if (postData.imageUrl) {
-            const imagePath = path.join(process.cwd(), postData.imageUrl.substring(1)); // '/' 제거
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-                console.log('Deleted image file:', imagePath);
-            }
-        }
+        // 이미지 파일은 base64로 저장되어 있으므로 별도 삭제 불필요
         
         return {
             statusCode: 200,
