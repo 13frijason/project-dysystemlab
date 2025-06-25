@@ -167,11 +167,6 @@
                 <li><a href="index.html#estimate">견적문의</a></li>
                 <li><a href="index.html#about">회사소개</a></li>
                 <li><a href="index.html#contact">연락처</a></li>
-                <li id="login-status">
-                    <a href="#" id="login-button" class="login-button" style="display: none;">로그인</a>
-                    <a href="#" id="logout-button" class="login-button" style="display: none;">로그아웃</a>
-                    <a href="/admin/" id="admin-link" class="admin-button" style="display: none;">관리자</a>
-                </li>
             </ul>
         </nav>
     </header>
@@ -194,7 +189,15 @@
     <footer>
         <div class="footer-content">
             <div class="footer-info">
-                <h3><img src="static/company_logo.png" alt="로고" style="height:28px; max-width:100px; object-fit:contain; vertical-align:middle; margin-right:8px;"> DYSystemlab</h3>
+                <h3>
+                    <img src="static/company_logo.png" alt="로고" style="height:28px; max-width:100px; object-fit:contain; vertical-align:middle; margin-right:8px;"> 
+                    DYSystemlab
+                    <div class="footer-login-buttons" style="display: inline-flex; margin-left: 1rem;">
+                        <a href="#" id="login-button" class="login-button" style="display: none;">로그인</a>
+                        <a href="#" id="logout-button" class="login-button" style="display: none;">로그아웃</a>
+                        <a href="/admin/" id="admin-link" class="admin-button" style="display: none;">관리자</a>
+                    </div>
+                </h3>
                 <p>최고의 전문성과 서비스로 고객님께 만족을 드리겠습니다.</p>
             </div>
             <div class="footer-contact">

@@ -230,7 +230,7 @@ nav a:hover {
 /* About Section */
 .about-section {
     position: relative;
-    background-color: #f8f9fa;
+    background-color: #e9ecef;
     padding: 2.5rem 0;
 }
 
@@ -299,7 +299,7 @@ nav a:hover {
 
 /* Contact Section */
 .contact-section {
-    background-color: #e9ecef;
+    background-color: #f8f9fa;
 }
 
 .contact-info {
@@ -498,18 +498,18 @@ nav a:hover {
 
 .estimate-form {
     background: var(--white);
-    padding: 2rem;
+    padding: 1.2rem;
     border-radius: 8px;
     box-shadow: var(--shadow);
 }
 
 .estimate-form .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.8rem;
 }
 
 .estimate-form label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
     font-weight: 500;
     color: var(--text-color);
 }
@@ -518,10 +518,10 @@ nav a:hover {
 .estimate-form select,
 .estimate-form textarea {
     width: 100%;
-    padding: 0.8rem;
+    padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 1rem;
+    font-size: 0.85rem;
     transition: border-color 0.3s;
 }
 
@@ -534,11 +534,11 @@ nav a:hover {
 
 .estimate-form textarea {
     resize: vertical;
-    min-height: 120px;
+    min-height: 60px;
 }
 
 .submit-button {
-    background-color: var(--primary-color);
+    background-color: #495057;
     color: var(--white);
     padding: 1rem 2rem;
     border: none;
@@ -555,7 +555,7 @@ nav a:hover {
 }
 
 .submit-button:hover {
-    background-color: var(--secondary-color);
+    background-color: #343a40;
 }
 
 .estimate-board-link {
@@ -573,18 +573,20 @@ nav a:hover {
     align-items: center;
     gap: 0.5rem;
     background-color: var(--white);
-    color: var(--primary-color);
-    padding: 0.8rem 1.5rem;
-    border: 2px solid var(--primary-color);
+    color: #495057;
+    padding: 0.6rem 1rem;
+    border: 2px solid #495057;
     border-radius: 4px;
     text-decoration: none;
     font-weight: 500;
+    font-size: 0.9rem;
     transition: all 0.3s;
 }
 
 .board-link-button:hover {
-    background-color: var(--primary-color);
+    background-color: #495057;
     color: var(--white);
+    border-color: #495057;
 }
 
 /* Responsive Design for Estimate Section */
@@ -628,6 +630,24 @@ footer {
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 1rem;
+}
+
+.footer-login-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.footer-login-buttons .login-button,
+.footer-login-buttons .admin-button {
+    padding: 0.12rem 0.24rem;
+    font-size: 0.32rem;
+    border-radius: 3px;
+    font-weight: inherit;
+    line-height: 1;
+    vertical-align: middle;
+    transform: scale(2.295);
+    transform-origin: left center;
 }
 
 .footer-contact {
