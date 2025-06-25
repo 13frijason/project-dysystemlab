@@ -73,11 +73,37 @@ exports.handler = async (event, context) => {
       
       // 파일 시스템에서 삭제
       const estimatesDir = path.join(process.cwd(), 'content', 'estimates');
-      let estimateFilePath = path.join(estimatesDir, `${id}.json`);
+      
+      // ID가 숫자인 경우 (Supabase ID), 파일명으로 변환 시도
+      let filename = id;
+      if (!isNaN(id) && !id.includes('.')) {
+        // 숫자 ID인 경우, 파일 목록에서 해당 ID를 가진 파일 찾기
+        try {
+          const files = fs.readdirSync(estimatesDir);
+          const matchingFile = files.find(file => {
+            if (file.endsWith('.json')) {
+              const filePath = path.join(estimatesDir, file);
+              const fileContent = fs.readFileSync(filePath, 'utf8');
+              const estimate = JSON.parse(fileContent);
+              return estimate.id === id || estimate.id === parseInt(id);
+            }
+            return false;
+          });
+          
+          if (matchingFile) {
+            filename = matchingFile;
+            console.log(`Found matching file for ID ${id}: ${filename}`);
+          }
+        } catch (error) {
+          console.log('Error searching for matching file:', error.message);
+        }
+      }
+      
+      let estimateFilePath = path.join(estimatesDir, `${filename}.json`);
       
       // ID가 이미 .json 확장자를 포함하고 있는지 확인
-      if (id.endsWith('.json')) {
-        estimateFilePath = path.join(estimatesDir, id);
+      if (filename.endsWith('.json')) {
+        estimateFilePath = path.join(estimatesDir, filename);
       }
       
       console.log('Estimate file path:', estimateFilePath);

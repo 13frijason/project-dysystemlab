@@ -61,6 +61,7 @@ exports.handler = async (event, context) => {
 
       if (!error && supabaseEstimates) {
         console.log(`Found ${supabaseEstimates.length} estimates from Supabase`);
+        console.log('Supabase estimates:', supabaseEstimates.map(e => ({ id: e.id, title: e.title })));
         estimates = supabaseEstimates;
         totalCount = count || 0;
       } else {
