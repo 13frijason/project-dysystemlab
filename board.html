@@ -706,6 +706,8 @@
             }
 
             try {
+                console.log('Deleting estimate with ID:', id);
+                
                 let headers = {
                     'Content-Type': 'application/json'
                 };
@@ -722,7 +724,9 @@
                     body: JSON.stringify({ id })
                 });
 
+                console.log('Delete response status:', response.status);
                 const result = await response.json();
+                console.log('Delete response result:', result);
 
                 if (result.success) {
                     showFlashMessage('견적문의가 삭제되었습니다.', 'success');
@@ -734,7 +738,7 @@
                     throw new Error(result.error || '삭제 실패');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Delete estimate error:', error);
                 showFlashMessage('견적문의 삭제 중 오류가 발생했습니다: ' + error.message, 'error');
             }
         }

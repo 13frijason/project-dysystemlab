@@ -2,15 +2,20 @@ const fs = require('fs');
 const path = require('path');
 
 exports.handler = async (event, context) => {
+    console.log('delete-construction function called');
+    console.log('HTTP Method:', event.httpMethod);
+    console.log('Headers:', event.headers);
+    
     // CORS 헤더 설정
     const headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'DELETE, OPTIONS'
     };
 
     // OPTIONS 요청 처리 (CORS preflight)
     if (event.httpMethod === 'OPTIONS') {
+        console.log('Handling OPTIONS request');
         return {
             statusCode: 200,
             headers,
@@ -18,7 +23,8 @@ exports.handler = async (event, context) => {
         };
     }
 
-    if (event.httpMethod !== 'POST') {
+    if (event.httpMethod !== 'DELETE') {
+        console.log('Method not allowed:', event.httpMethod);
         return {
             statusCode: 405,
             headers,
@@ -28,12 +34,14 @@ exports.handler = async (event, context) => {
 
     try {
         console.log('Received construction deletion request');
+        console.log('Request body:', event.body);
         
         // 요청 본문 파싱
         const requestBody = JSON.parse(event.body);
         const { id } = requestBody;
         
         if (!id) {
+            console.log('No ID provided');
             return {
                 statusCode: 400,
                 headers,
@@ -47,8 +55,11 @@ exports.handler = async (event, context) => {
         const postsDir = path.join(process.cwd(), 'content', 'construction');
         const postFilePath = path.join(postsDir, `${id}.json`);
         
+        console.log('Post file path:', postFilePath);
+        
         // 게시물 파일이 존재하는지 확인
         if (!fs.existsSync(postFilePath)) {
+            console.log('Post file not found');
             return {
                 statusCode: 404,
                 headers,
@@ -58,6 +69,7 @@ exports.handler = async (event, context) => {
         
         // 게시물 데이터 읽기 (이미지 경로 확인용)
         const postData = JSON.parse(fs.readFileSync(postFilePath, 'utf8'));
+        console.log('Post data loaded');
         
         // 게시물 파일 삭제
         fs.unlinkSync(postFilePath);

@@ -7,16 +7,19 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event, context) => {
   console.log('delete-estimate function called');
+  console.log('HTTP Method:', event.httpMethod);
+  console.log('Headers:', event.headers);
   
   // CORS 헤더 설정
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'DELETE, OPTIONS'
   };
 
   // OPTIONS 요청 처리 (CORS preflight)
   if (event.httpMethod === 'OPTIONS') {
+    console.log('Handling OPTIONS request');
     return {
       statusCode: 200,
       headers,
@@ -26,6 +29,7 @@ exports.handler = async (event, context) => {
 
   // DELETE 요청만 허용
   if (event.httpMethod !== 'DELETE') {
+    console.log('Method not allowed:', event.httpMethod);
     return {
       statusCode: 405,
       headers,
@@ -35,11 +39,13 @@ exports.handler = async (event, context) => {
 
   try {
     console.log('Parsing request body...');
+    console.log('Request body:', event.body);
     const { id } = JSON.parse(event.body);
     
     console.log('Deleting estimate with ID:', id);
     
     if (!id) {
+      console.log('No ID provided');
       return {
         statusCode: 400,
         headers,
@@ -48,6 +54,7 @@ exports.handler = async (event, context) => {
     }
 
     // Supabase에서 견적문의 삭제
+    console.log('Attempting to delete from Supabase...');
     const { error } = await supabase
       .from('estimates')
       .delete()
