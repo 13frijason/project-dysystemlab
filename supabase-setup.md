@@ -36,6 +36,10 @@ CREATE POLICY "Allow anonymous read access" ON estimates
 -- 익명 사용자 삽입 권한
 CREATE POLICY "Allow anonymous insert" ON estimates
   FOR INSERT WITH CHECK (true);
+
+-- 관리자 삭제 권한 (모든 행 삭제 가능)
+CREATE POLICY "Allow admin delete" ON estimates
+  FOR DELETE USING (true);
 ```
 
 ## 3. Netlify 환경 변수 설정

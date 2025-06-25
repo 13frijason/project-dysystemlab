@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 // Supabase 클라이언트 초기화
@@ -45,19 +47,66 @@ exports.handler = async (event, context) => {
 
     console.log(`Fetching estimates: page ${page}, perPage ${perPage}, from ${from}, to ${to}`);
 
-    // Supabase에서 데이터 가져오기
-    const { data: estimates, error, count } = await supabase
-      .from('estimates')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .range(from, to);
+    let estimates = [];
+    let totalCount = 0;
 
-    if (error) {
-      console.error('Supabase error:', error);
-      throw new Error(`데이터베이스 조회 실패: ${error.message}`);
+    // 먼저 Supabase에서 데이터 가져오기 시도
+    try {
+      console.log('Attempting to fetch from Supabase...');
+      const { data: supabaseEstimates, error, count } = await supabase
+        .from('estimates')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+      if (!error && supabaseEstimates) {
+        console.log(`Found ${supabaseEstimates.length} estimates from Supabase`);
+        estimates = supabaseEstimates;
+        totalCount = count || 0;
+      } else {
+        console.log('Supabase fetch failed, trying file system...');
+        throw new Error('Supabase fetch failed');
+      }
+    } catch (supabaseError) {
+      console.log('Supabase error, falling back to file system:', supabaseError.message);
+      
+      // 파일 시스템에서 데이터 가져오기
+      const estimatesDir = path.join(process.cwd(), 'content', 'estimates');
+      
+      if (fs.existsSync(estimatesDir)) {
+        const files = fs.readdirSync(estimatesDir)
+          .filter(file => file.endsWith('.json'))
+          .sort((a, b) => {
+            // 파일명을 기준으로 내림차순 정렬 (최신 파일이 먼저)
+            const aTime = fs.statSync(path.join(estimatesDir, a)).mtime.getTime();
+            const bTime = fs.statSync(path.join(estimatesDir, b)).mtime.getTime();
+            return bTime - aTime;
+          });
+
+        console.log(`Found ${files.length} estimate files`);
+
+        // 전체 파일 수
+        totalCount = files.length;
+
+        // 페이지네이션 적용
+        const startIndex = from;
+        const endIndex = Math.min(to + 1, files.length);
+        const pageFiles = files.slice(startIndex, endIndex);
+
+        estimates = pageFiles.map(filename => {
+          const filePath = path.join(estimatesDir, filename);
+          const fileContent = fs.readFileSync(filePath, 'utf8');
+          const estimate = JSON.parse(fileContent);
+          
+          // 파일명을 ID로 사용
+          estimate.id = filename.replace('.json', '');
+          
+          return estimate;
+        });
+
+        console.log(`Loaded ${estimates.length} estimates from file system`);
+      }
     }
-
-    console.log(`Found ${estimates.length} estimates, total count: ${count}`);
 
     // 개인정보 마스킹 (관리자가 아닌 경우)
     const isAdmin = event.headers.authorization && event.headers.authorization.includes('Bearer');
@@ -69,10 +118,10 @@ exports.handler = async (event, context) => {
       });
     }
 
-    const totalPages = Math.ceil((count || 0) / perPage);
+    const totalPages = Math.ceil((totalCount || 0) / perPage);
     const hasMore = page < totalPages;
 
-    console.log(`Pagination: page ${page}, perPage ${perPage}, total ${count}, totalPages ${totalPages}`);
+    console.log(`Pagination: page ${page}, perPage ${perPage}, total ${totalCount}, totalPages ${totalPages}`);
 
     // 캐시 헤더 추가 (5분 캐시)
     headers['Cache-Control'] = 'public, max-age=300';
@@ -82,7 +131,7 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         estimates: estimates || [],
-        total: count || 0,
+        total: totalCount || 0,
         page: page,
         per_page: perPage,
         total_pages: totalPages,
