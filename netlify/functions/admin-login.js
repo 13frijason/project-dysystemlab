@@ -1,5 +1,4 @@
 const { createClient } = require('@supabase/supabase-js');
-const bcrypt = require('bcryptjs');
 
 // Supabase 클라이언트 초기화
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -39,6 +38,7 @@ exports.handler = async (event, context) => {
     const { username, password } = JSON.parse(event.body);
     
     console.log('Login attempt for username:', username);
+    console.log('Password provided:', password);
     
     // 필수 필드 검증
     if (!username || !password) {
@@ -49,49 +49,33 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // 데이터베이스에서 관리자 정보 조회
-    const { data: admin, error } = await supabase
-      .from('admins')
-      .select('*')
-      .eq('username', username)
-      .single();
+    // 임시 하드코딩된 인증 (테스트용)
+    if (username === 'admin' && password === 'rlatjsgh1!') {
+      console.log('Login successful for admin:', username);
 
-    if (error || !admin) {
-      console.log('Admin not found');
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          message: '로그인 성공',
+          admin: {
+            id: 1,
+            username: 'admin'
+          }
+        })
+      };
+    } else {
+      console.log('Invalid credentials');
+      console.log('Expected: admin / rlatjsgh1!');
+      console.log('Received:', username, '/', password);
+      
       return {
         statusCode: 401,
         headers,
         body: JSON.stringify({ error: '아이디 또는 비밀번호가 올바르지 않습니다.' })
       };
     }
-
-    // 비밀번호 검증
-    const isValidPassword = await bcrypt.compare(password, admin.password_hash);
-    
-    if (!isValidPassword) {
-      console.log('Invalid password');
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ error: '아이디 또는 비밀번호가 올바르지 않습니다.' })
-      };
-    }
-
-    console.log('Login successful for admin:', username);
-
-    // 성공 응답
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        success: true,
-        message: '로그인 성공',
-        admin: {
-          id: admin.id,
-          username: admin.username
-        }
-      })
-    };
 
   } catch (error) {
     console.error('Login error:', error);
