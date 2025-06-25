@@ -610,10 +610,17 @@
             pagination.style.display = 'none';
 
             try {
-                const url = `/.netlify/functions/get-estimates?page=${currentPage}&per_page=${perPage}`;
+                const url = `/.netlify/functions/get-estimates?page=${currentPage}&per_page=${perPage}&t=${Date.now()}`;
                 console.log('Fetching from URL:', url);
                 
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
                 console.log('Response status:', response.status);
                 
                 const data = await response.json();
@@ -716,6 +723,13 @@
                 return;
             }
 
+            // 삭제 중인 견적문의 요소를 즉시 숨김
+            const estimateElement = document.querySelector(`[data-id="${id}"]`);
+            if (estimateElement) {
+                estimateElement.style.opacity = '0.5';
+                estimateElement.style.pointerEvents = 'none';
+            }
+
             try {
                 console.log('=== DELETE ESTIMATE DEBUG ===');
                 console.log('Deleting estimate with ID:', id);
@@ -748,17 +762,24 @@
 
                 if (result.success) {
                     showFlashMessage('견적문의가 삭제되었습니다.', 'success');
-                    console.log('Delete successful, reloading estimates...');
+                    console.log('Delete successful, reloading estimates immediately...');
                     
                     // 삭제 후 즉시 목록 새로고침
-                    setTimeout(() => {
-                        console.log('Reloading estimates after delete...');
-                        loadEstimates();
-                    }, 1000); // 1초로 늘림
+                    loadEstimates();
                 } else {
+                    // 삭제 실패 시 요소를 다시 표시
+                    if (estimateElement) {
+                        estimateElement.style.opacity = '1';
+                        estimateElement.style.pointerEvents = 'auto';
+                    }
                     throw new Error(result.error || '삭제 실패');
                 }
             } catch (error) {
+                // 에러 발생 시 요소를 다시 표시
+                if (estimateElement) {
+                    estimateElement.style.opacity = '1';
+                    estimateElement.style.pointerEvents = 'auto';
+                }
                 console.error('Delete estimate error:', error);
                 showFlashMessage('견적문의 삭제 중 오류가 발생했습니다: ' + error.message, 'error');
             }

@@ -75,8 +75,10 @@ exports.handler = async (event, context) => {
 
     console.log(`Pagination: page ${page}, perPage ${perPage}, total ${count}, totalPages ${totalPages}`);
 
-    // 캐시 헤더 추가 (5분 캐시)
-    headers['Cache-Control'] = 'public, max-age=300';
+    // 캐시 방지 헤더 설정
+    headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+    headers['Pragma'] = 'no-cache';
+    headers['Expires'] = '0';
 
     return {
       statusCode: 200,
