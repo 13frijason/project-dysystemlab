@@ -2,6 +2,10 @@ const fs = require('fs').promises;
 const path = require('path');
 
 exports.handler = async (event, context) => {
+  console.log('get-estimates function called');
+  console.log('HTTP method:', event.httpMethod);
+  console.log('Query parameters:', event.queryStringParameters);
+  
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -10,6 +14,7 @@ exports.handler = async (event, context) => {
 
   // OPTIONS 요청 처리
   if (event.httpMethod === 'OPTIONS') {
+    console.log('Handling OPTIONS request');
     return {
       statusCode: 200,
       headers,
@@ -19,6 +24,7 @@ exports.handler = async (event, context) => {
 
   // GET 요청만 허용
   if (event.httpMethod !== 'GET') {
+    console.log('Invalid method:', event.httpMethod);
     return {
       statusCode: 405,
       headers,
@@ -27,12 +33,18 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const dataDir = path.join(process.cwd(), 'content', 'estimates');
+    const cwd = process.cwd();
+    console.log('Current working directory:', cwd);
+    
+    const dataDir = path.join(cwd, 'content', 'estimates');
+    console.log('Data directory:', dataDir);
     
     // 디렉토리가 없으면 빈 배열 반환
     try {
       await fs.access(dataDir);
+      console.log('Data directory exists');
     } catch (err) {
+      console.log('Data directory does not exist, returning empty array');
       return {
         statusCode: 200,
         headers,
@@ -41,14 +53,17 @@ exports.handler = async (event, context) => {
           total: 0,
           page: 1,
           per_page: 10,
-          total_pages: 0
+          total_pages: 0,
+          has_more: false
         })
       };
     }
 
-    // 모든 JSON 파일 읽기 (최적화된 방식)
+    // 모든 JSON 파일 읽기
+    console.log('Reading directory contents...');
     const files = await fs.readdir(dataDir);
     const jsonFiles = files.filter(file => file.endsWith('.json'));
+    console.log(`Found ${jsonFiles.length} JSON files`);
     
     // 파일 수가 많을 경우를 대비한 최적화
     const estimates = [];
@@ -60,6 +75,7 @@ exports.handler = async (event, context) => {
       const batchPromises = batch.map(async (file) => {
         try {
           const filePath = path.join(dataDir, file);
+          console.log(`Reading file: ${filePath}`);
           const content = await fs.readFile(filePath, 'utf8');
           const estimate = JSON.parse(content);
           
@@ -82,6 +98,8 @@ exports.handler = async (event, context) => {
       estimates.push(...batchResults.filter(estimate => estimate !== null));
     }
 
+    console.log(`Successfully loaded ${estimates.length} estimates`);
+
     // 날짜순으로 정렬 (최신순)
     estimates.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
@@ -91,6 +109,11 @@ exports.handler = async (event, context) => {
     const startIndex = (page - 1) * perPage;
     const endIndex = startIndex + perPage;
     const paginatedEstimates = estimates.slice(startIndex, endIndex);
+    
+    const totalPages = Math.ceil(estimates.length / perPage);
+    const hasMore = page < totalPages;
+
+    console.log(`Pagination: page ${page}, perPage ${perPage}, total ${estimates.length}, totalPages ${totalPages}`);
 
     // 캐시 헤더 추가 (5분 캐시)
     headers['Cache-Control'] = 'public, max-age=300';
@@ -103,17 +126,21 @@ exports.handler = async (event, context) => {
         total: estimates.length,
         page: page,
         per_page: perPage,
-        total_pages: Math.ceil(estimates.length / perPage),
-        has_more: page < Math.ceil(estimates.length / perPage)
+        total_pages: totalPages,
+        has_more: hasMore
       })
     };
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in get-estimates:', error);
+    console.error('Error stack:', error.stack);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: '서버 오류가 발생했습니다.' })
+      body: JSON.stringify({ 
+        error: '서버 오류가 발생했습니다.',
+        details: error.message 
+      })
     };
   }
 };

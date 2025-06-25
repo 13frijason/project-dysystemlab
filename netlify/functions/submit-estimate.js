@@ -65,8 +65,12 @@ exports.handler = async (event, context) => {
 
     console.log('Created estimate object:', estimate);
 
-    // 데이터를 JSON 파일로 저장
-    const dataDir = path.join(process.cwd(), 'content', 'estimates');
+    // 현재 작업 디렉토리 확인
+    const cwd = process.cwd();
+    console.log('Current working directory:', cwd);
+    
+    // 데이터를 JSON 파일로 저장 (상대 경로 사용)
+    const dataDir = path.join(cwd, 'content', 'estimates');
     const filePath = path.join(dataDir, `${estimate.id}.json`);
     
     console.log('Data directory:', dataDir);
@@ -78,13 +82,19 @@ exports.handler = async (event, context) => {
       await fs.mkdir(dataDir, { recursive: true });
       console.log('Directory created successfully');
     } catch (err) {
-      console.log('Directory creation error (might already exist):', err.message);
+      console.log('Directory creation error:', err.message);
+      // 디렉토리 생성 실패 시에도 계속 진행 (이미 존재할 수 있음)
     }
 
     // 파일에 데이터 저장
-    console.log('Writing file...');
-    await fs.writeFile(filePath, JSON.stringify(estimate, null, 2));
-    console.log('File written successfully');
+    try {
+      console.log('Writing file...');
+      await fs.writeFile(filePath, JSON.stringify(estimate, null, 2), 'utf8');
+      console.log('File written successfully');
+    } catch (writeErr) {
+      console.error('File write error:', writeErr);
+      throw new Error(`파일 저장 실패: ${writeErr.message}`);
+    }
 
     // 성공 응답
     console.log('Sending success response');
@@ -102,6 +112,19 @@ exports.handler = async (event, context) => {
   } catch (error) {
     console.error('Detailed error:', error);
     console.error('Error stack:', error.stack);
+    
+    // JSON 파싱 오류인지 확인
+    if (error instanceof SyntaxError) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          error: '잘못된 데이터 형식입니다.',
+          details: error.message 
+        })
+      };
+    }
+    
     return {
       statusCode: 500,
       headers,
