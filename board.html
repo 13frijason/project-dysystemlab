@@ -596,6 +596,9 @@
 
         // 견적문의 목록 로드
         async function loadEstimates() {
+            console.log('=== LOAD ESTIMATES DEBUG ===');
+            console.log('Loading estimates for page:', currentPage);
+            
             const loading = document.getElementById('loading');
             const estimatesList = document.getElementById('estimates-list');
             const noEstimates = document.getElementById('no-estimates');
@@ -607,14 +610,22 @@
             pagination.style.display = 'none';
 
             try {
-                const response = await fetch(`/.netlify/functions/get-estimates?page=${currentPage}&per_page=${perPage}`);
+                const url = `/.netlify/functions/get-estimates?page=${currentPage}&per_page=${perPage}`;
+                console.log('Fetching from URL:', url);
+                
+                const response = await fetch(url);
+                console.log('Response status:', response.status);
+                
                 const data = await response.json();
+                console.log('Response data:', data);
 
                 if (data.estimates && data.estimates.length > 0) {
+                    console.log(`Displaying ${data.estimates.length} estimates`);
                     displayEstimates(data.estimates);
                     displayPagination(data);
                     estimatesList.style.display = 'block';
                 } else {
+                    console.log('No estimates found, showing no-estimates message');
                     noEstimates.style.display = 'block';
                 }
             } catch (error) {
@@ -737,10 +748,13 @@
 
                 if (result.success) {
                     showFlashMessage('견적문의가 삭제되었습니다.', 'success');
+                    console.log('Delete successful, reloading estimates...');
+                    
                     // 삭제 후 즉시 목록 새로고침
                     setTimeout(() => {
+                        console.log('Reloading estimates after delete...');
                         loadEstimates();
-                    }, 500);
+                    }, 1000); // 1초로 늘림
                 } else {
                     throw new Error(result.error || '삭제 실패');
                 }
