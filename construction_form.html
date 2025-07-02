@@ -569,8 +569,13 @@
         }
 
         // 폼 제출 처리
-        document.getElementById('constructionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        const constructionForm = document.getElementById('constructionForm');
+        console.log('Construction form element:', constructionForm);
+        
+        if (constructionForm) {
+            constructionForm.addEventListener('submit', async (e) => {
+                console.log('Form submit event triggered');
+                e.preventDefault();
             
             // 로그인 상태 재확인
             const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -640,6 +645,9 @@
                 showLoading(false);
             }
         });
+        } else {
+            console.error('Construction form element not found');
+        }
 
         // 메시지 표시 함수들
         function showError(message) {
@@ -723,6 +731,9 @@
             const loginButton = document.getElementById('login-button');
             const logoutButton = document.getElementById('logout-button');
             const adminLink = document.getElementById('admin-link');
+            const loginRequired = document.getElementById('login-required');
+            const formContent = document.getElementById('form-content');
+            const backButton = document.getElementById('back-button');
             
             // 로컬 스토리지에서 관리자 로그인 상태 확인
             const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -733,6 +744,9 @@
                 loginButton.style.display = 'none';
                 logoutButton.style.display = 'inline-block';
                 adminLink.style.display = 'inline-block';
+                loginRequired.style.display = 'none';
+                formContent.style.display = 'block';
+                backButton.style.display = 'inline-flex';
                 logoutButton.onclick = () => {
                     // 로그아웃 처리
                     localStorage.removeItem('adminLoggedIn');
@@ -745,6 +759,9 @@
                 loginButton.style.display = 'inline-block';
                 logoutButton.style.display = 'none';
                 adminLink.style.display = 'none';
+                loginRequired.style.display = 'block';
+                formContent.style.display = 'none';
+                backButton.style.display = 'none';
                 loginButton.onclick = () => {
                     console.log('Login button clicked');
                     // 관리자 로그인 페이지로 이동
