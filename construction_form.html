@@ -655,9 +655,14 @@
 
         // 페이지 로드 시 로그인 상태 확인 및 오늘 날짜 설정
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, checking login status');
+            
             // 로컬 스토리지에서 관리자 로그인 상태 확인
             const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
             const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+            
+            console.log('Admin logged in:', adminLoggedIn);
+            console.log('Admin info:', adminInfo);
             
             if (adminLoggedIn && adminInfo.username) {
                 updateLoginStatus(adminInfo);

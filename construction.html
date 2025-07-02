@@ -514,6 +514,9 @@
                             <p class="post-date">${post.date}</p>
                             <p class="post-text">${post.description}</p>
                             ${isLoggedIn ? `<button class="delete-button" onclick="deletePost('${post.id}')">삭제</button>` : ''}
+                            <div style="font-size: 0.8rem; color: #999; margin-top: 0.5rem;">
+                                로그인 상태: ${isLoggedIn ? '관리자' : '비로그인'}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -524,11 +527,20 @@
 
         // 게시물 삭제 함수
         async function deletePost(postId) {
+            console.log('Attempting to delete post:', postId);
+            console.log('Current login status:', isLoggedIn);
+            
+            if (!isLoggedIn) {
+                alert('관리자 로그인이 필요합니다.');
+                return;
+            }
+            
             if (!confirm('정말로 이 게시물을 삭제하시겠습니까?')) {
                 return;
             }
             
             try {
+                console.log('Sending delete request for post ID:', postId);
                 const response = await fetch('/.netlify/functions/delete-construction', {
                     method: 'DELETE',
                     headers: {
@@ -537,7 +549,9 @@
                     body: JSON.stringify({ id: postId })
                 });
                 
+                console.log('Delete response status:', response.status);
                 const result = await response.json();
+                console.log('Delete response:', result);
                 
                 if (response.ok && result.success) {
                     alert('게시물이 삭제되었습니다.');
