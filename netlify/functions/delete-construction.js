@@ -1,19 +1,22 @@
-const fs = require('fs');
-const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
+
+// Supabase 클라이언트 초기화
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event, context) => {
     console.log('delete-construction function called');
-    console.log('HTTP Method:', event.httpMethod);
-    console.log('Headers:', event.headers);
+    console.log('HTTP method:', event.httpMethod);
+    console.log('Event body:', event.body);
     
-    // CORS 헤더 설정
     const headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'DELETE, OPTIONS'
     };
 
-    // OPTIONS 요청 처리 (CORS preflight)
+    // OPTIONS 요청 처리
     if (event.httpMethod === 'OPTIONS') {
         console.log('Handling OPTIONS request');
         return {
@@ -23,8 +26,9 @@ exports.handler = async (event, context) => {
         };
     }
 
+    // DELETE 요청만 허용
     if (event.httpMethod !== 'DELETE') {
-        console.log('Method not allowed:', event.httpMethod);
+        console.log('Invalid method:', event.httpMethod);
         return {
             statusCode: 405,
             headers,
@@ -33,65 +37,70 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        console.log('Received construction deletion request');
-        console.log('Request body:', event.body);
+        console.log('Parsing request body...');
+        const data = JSON.parse(event.body);
+        console.log('Parsed data:', data);
         
-        // 요청 본문 파싱
-        const requestBody = JSON.parse(event.body);
-        const { id } = requestBody;
-        
-        if (!id) {
-            console.log('No ID provided');
+        // 필수 필드 검증
+        if (!data.id) {
+            console.log('Missing required field: id');
             return {
                 statusCode: 400,
                 headers,
                 body: JSON.stringify({ error: '게시물 ID가 필요합니다.' })
             };
         }
-        
-        console.log('Deleting construction post with ID:', id);
-        
-        // 게시물 파일 경로
-        const postsDir = path.join(process.cwd(), 'content', 'construction');
-        const postFilePath = path.join(postsDir, `${id}.json`);
-        
-        console.log('Post file path:', postFilePath);
-        
-        // 게시물 파일이 존재하는지 확인
-        if (!fs.existsSync(postFilePath)) {
-            console.log('Post file not found');
-            return {
-                statusCode: 404,
-                headers,
-                body: JSON.stringify({ error: '게시물을 찾을 수 없습니다.' })
-            };
+
+        // Supabase에서 데이터 삭제 (실제 삭제 대신 상태를 '삭제됨'으로 변경)
+        const { data: deletedConstruction, error } = await supabase
+            .from('construction')
+            .update({ status: '삭제됨' })
+            .eq('id', data.id)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Supabase error:', error);
+            throw new Error(`데이터베이스 삭제 실패: ${error.message}`);
         }
-        
-        // 게시물 데이터 읽기 (이미지 경로 확인용)
-        const postData = JSON.parse(fs.readFileSync(postFilePath, 'utf8'));
-        console.log('Post data loaded');
-        
-        // 게시물 파일 삭제
-        fs.unlinkSync(postFilePath);
-        console.log('Deleted post file:', postFilePath);
-        
-        // 이미지 파일은 base64로 저장되어 있으므로 별도 삭제 불필요
-        
+
+        console.log('Successfully deleted from Supabase:', deletedConstruction);
+
+        // 성공 응답
+        console.log('Sending success response');
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({ 
                 success: true, 
-                message: '게시물이 성공적으로 삭제되었습니다.' 
+                message: '시공사진이 성공적으로 삭제되었습니다.',
+                id: data.id
             })
         };
-        
+
     } catch (error) {
-        console.error('Error deleting construction post:', error);
+        console.error('Detailed error:', error);
+        console.error('Error stack:', error.stack);
+        
+        // JSON 파싱 오류인지 확인
+        if (error instanceof SyntaxError) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ 
+                    error: '잘못된 데이터 형식입니다.',
+                    details: error.message 
+                })
+            };
+        }
+        
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: '게시물 삭제 중 오류가 발생했습니다.' })
+            body: JSON.stringify({ 
+                error: '서버 오류가 발생했습니다.',
+                details: error.message 
+            })
         };
     }
 }; 

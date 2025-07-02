@@ -284,8 +284,8 @@
             try {
                 const response = await fetch('/.netlify/functions/get-construction');
                 if (response.ok) {
-                    const posts = await response.json();
-                    displayPosts(posts);
+                    const data = await response.json();
+                    displayPosts(data);
                 } else {
                     container.innerHTML = '<div class="error">게시물을 불러오는데 실패했습니다.</div>';
                 }
@@ -296,18 +296,18 @@
         }
 
         // 게시물 표시 함수
-        function displayPosts(posts) {
+        function displayPosts(data) {
             const container = document.getElementById('posts-container');
             
-            if (posts.length === 0) {
+            if (!data.construction || data.construction.length === 0) {
                 container.innerHTML = '<div class="loading">등록된 게시물이 없습니다.</div>';
                 return;
             }
             
-            const postsHTML = posts.map(post => `
+            const postsHTML = data.construction.map(post => `
                 <div class="post-card" data-id="${post.id}">
                     <div class="post-image">
-                        <img src="${post.imageUrl}" alt="${post.title}">
+                        <img src="data:image/jpeg;base64,${post.image_data}" alt="${post.title}">
                     </div>
                     <div class="post-content">
                         <h3>${post.title}</h3>

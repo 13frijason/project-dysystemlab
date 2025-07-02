@@ -3,184 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DYSystemlab - 시공사진 등록</title>
+    <title>시공사진 등록 - DYSystemlab</title>
     <link rel="stylesheet" href="static/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
-        .construction-form {
+        .construction-form-container {
             max-width: 800px;
             margin: 2rem auto;
             padding: 2rem;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .construction-form {
+            display: grid;
+            gap: 1.5rem;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
             font-weight: 500;
             color: #333;
+            font-size: 1rem;
         }
 
         .form-group input,
-        .form-group textarea {
-            width: 100%;
+        .form-group textarea,
+        .form-group select {
             padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
             font-size: 1rem;
-            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
         }
 
         .form-group textarea {
-            min-height: 120px;
             resize: vertical;
+            min-height: 120px;
         }
 
-        .form-group input[type="file"] {
-            padding: 0.5rem;
-        }
-
-        .submit-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 0.75rem 2rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 500;
+        .image-upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: border-color 0.3s ease;
         }
 
-        .submit-btn:hover {
-            background-color: #0056b3;
+        .image-upload-area:hover {
+            border-color: #007bff;
         }
 
-        .cancel-btn {
-            background-color: #6c757d;
-            color: white;
-            padding: 0.75rem 2rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-right: 1rem;
-            transition: background-color 0.3s;
+        .image-upload-area.dragover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
         }
 
-        .cancel-btn:hover {
-            background-color: #545b62;
-        }
-
-        .preview-image {
-            max-width: 200px;
-            max-height: 200px;
-            margin-top: 0.5rem;
-            border-radius: 4px;
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 1rem;
+            border-radius: 8px;
             display: none;
         }
 
-        .login-button {
-            background-color: #6c757d;
+        .submit-button {
+            background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
-            padding: 0.375rem 0.75rem;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 400;
-            font-size: 0.875rem;
-            transition: background-color 0.3s;
-            display: inline-block;
-            line-height: 1.5;
-            vertical-align: baseline;
+            padding: 1rem 2rem;
             border: none;
-            margin: 0;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
-        .login-button:hover {
-            background-color: #5a6268;
+        .submit-button:hover {
+            transform: translateY(-2px);
         }
 
-        .admin-button {
-            background-color: #28a745;
+        .submit-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-button {
+            background: #6c757d;
             color: white;
-            padding: 0.375rem 0.75rem;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 400;
-            font-size: 0.875rem;
-            transition: background-color 0.3s;
-            display: inline-block;
-            line-height: 1.5;
-            vertical-align: baseline;
+            padding: 0.75rem 1.5rem;
             border: none;
-            margin: 0;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            transition: background-color 0.3s ease;
         }
 
-        .admin-button:hover {
-            background-color: #218838;
+        .back-button:hover {
+            background: #5a6268;
         }
 
-        /* 반응형 네비게이션 */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
         @media (max-width: 768px) {
-            .navbar-nav {
-                flex-direction: column;
-                width: 100%;
-                text-align: center;
+            .construction-form-container {
+                margin: 1rem;
+                padding: 1.5rem;
             }
             
-            .navbar-nav .nav-item {
-                margin: 0.25rem 0;
+            .form-header h1 {
+                font-size: 1.5rem;
             }
             
-            .navbar-nav .nav-link {
-                padding: 0.5rem 1rem;
-                font-size: 0.9rem;
-            }
-            
-            .login-button, .admin-button {
-                padding: 0.25rem 0.5rem;
-                font-size: 0.8rem;
-                margin: 0.25rem 0;
-                display: inline-block;
-            }
-            
-            .navbar-brand {
-                font-size: 1.1rem;
-                margin-bottom: 0.5rem;
-            }
-            
-            .navbar-toggler {
-                margin-bottom: 0.5rem;
-            }
-            
-            .navbar-collapse {
-                padding: 1rem 0;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .navbar-nav .nav-link {
-                font-size: 0.85rem;
-                padding: 0.4rem 0.8rem;
-            }
-            
-            .login-button, .admin-button {
-                font-size: 0.75rem;
-                padding: 0.2rem 0.4rem;
-            }
-            
-            .navbar-brand {
+            .submit-button {
+                padding: 0.875rem 1.5rem;
                 font-size: 1rem;
             }
         }
@@ -204,35 +207,57 @@
         </nav>
     </header>
 
-    <div class="construction-form">
-        <h2>시공사진 게시물 작성</h2>
-        <form id="constructionForm" enctype="multipart/form-data">
+    <div class="construction-form-container">
+        <a href="construction.html" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            목록으로 돌아가기
+        </a>
+
+        <div class="form-header">
+            <h1>시공사진 등록</h1>
+            <p>완료된 시공사례의 사진과 정보를 등록해주세요</p>
+        </div>
+
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+
+        <form id="constructionForm" class="construction-form">
             <div class="form-group">
                 <label for="title">제목 *</label>
-                <input type="text" id="title" name="title" required>
+                <input type="text" id="title" name="title" required placeholder="예: 서울대학교 에어컨 설치">
             </div>
 
             <div class="form-group">
-                <label for="date">작성일 *</label>
+                <label for="date">시공일 *</label>
                 <input type="date" id="date" name="date" required>
             </div>
 
             <div class="form-group">
-                <label for="image">이미지 *</label>
-                <input type="file" id="image" name="image" accept="image/*" required>
-                <img id="imagePreview" class="preview-image" alt="미리보기">
+                <label for="description">시공 내용 *</label>
+                <textarea id="description" name="description" required placeholder="시공 내용을 자세히 설명해주세요. (설치 장소, 규모, 특이사항 등)"></textarea>
             </div>
 
             <div class="form-group">
-                <label for="description">설명 *</label>
-                <textarea id="description" name="description" required placeholder="시공 내용에 대한 상세한 설명을 입력해주세요."></textarea>
+                <label for="imageUpload">시공사진 *</label>
+                <div id="imageUploadArea" class="image-upload-area">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem;"></i>
+                    <p>클릭하여 사진을 선택하거나 여기에 드래그하세요</p>
+                    <p style="font-size: 0.9rem; color: #999;">지원 형식: JPG, PNG, GIF (최대 5MB)</p>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;" required>
+                </div>
+                <img id="imagePreview" class="image-preview" alt="미리보기">
             </div>
 
-            <div class="form-actions">
-                <a href="construction.html" class="cancel-btn">취소</a>
-                <button type="submit" class="submit-btn">게시물 등록</button>
-            </div>
+            <button type="submit" id="submitButton" class="submit-button">
+                <i class="fas fa-upload"></i>
+                시공사진 등록
+            </button>
         </form>
+
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>시공사진을 등록하는 중...</p>
+        </div>
     </div>
 
     <footer>
@@ -260,6 +285,159 @@
     </footer>
 
     <script>
+        let selectedImage = null;
+
+        // 이미지 업로드 영역 클릭 이벤트
+        document.getElementById('imageUploadArea').addEventListener('click', () => {
+            document.getElementById('imageUpload').click();
+        });
+
+        // 드래그 앤 드롭 이벤트
+        const uploadArea = document.getElementById('imageUploadArea');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleImageFile(files[0]);
+            }
+        });
+
+        // 파일 선택 이벤트
+        document.getElementById('imageUpload').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleImageFile(e.target.files[0]);
+            }
+        });
+
+        // 이미지 파일 처리
+        function handleImageFile(file) {
+            // 파일 크기 검증 (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showError('파일 크기는 5MB 이하여야 합니다.');
+                return;
+            }
+
+            // 파일 형식 검증
+            if (!file.type.startsWith('image/')) {
+                showError('이미지 파일만 업로드 가능합니다.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                selectedImage = e.target.result;
+                document.getElementById('imagePreview').src = selectedImage;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 폼 제출 처리
+        document.getElementById('constructionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!selectedImage) {
+                showError('시공사진을 선택해주세요.');
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const data = {
+                title: formData.get('title'),
+                date: formData.get('date'),
+                description: formData.get('description'),
+                imageData: selectedImage,
+                imageName: document.getElementById('imageUpload').files[0]?.name || 'image.jpg'
+            };
+
+            // 로딩 상태 표시
+            showLoading(true);
+            hideMessages();
+
+            try {
+                const response = await fetch('/.netlify/functions/submit-construction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccess('시공사진이 성공적으로 등록되었습니다.');
+                    e.target.reset();
+                    document.getElementById('imagePreview').style.display = 'none';
+                    selectedImage = null;
+                    
+                    // 2초 후 목록 페이지로 이동
+                    setTimeout(() => {
+                        window.location.href = 'construction.html';
+                    }, 2000);
+                } else {
+                    throw new Error(result.error || '시공사진 등록에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message || '시공사진 등록 중 오류가 발생했습니다.');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // 메시지 표시 함수들
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        function hideMessages() {
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            const form = document.getElementById('constructionForm');
+            const submitButton = document.getElementById('submitButton');
+            
+            if (show) {
+                loading.style.display = 'block';
+                form.style.display = 'none';
+                submitButton.disabled = true;
+            } else {
+                loading.style.display = 'none';
+                form.style.display = 'grid';
+                submitButton.disabled = false;
+            }
+        }
+
+        // 페이지 로드 시 오늘 날짜를 기본값으로 설정
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+        });
+
         // Netlify Identity 초기화
         if (window.netlifyIdentity) {
             window.netlifyIdentity.on("init", user => {
@@ -315,92 +493,6 @@
                 };
             }
         }
-
-        // 이미지 미리보기
-        document.getElementById('image').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('imagePreview');
-            
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                preview.style.display = 'none';
-            }
-        });
-
-        // 폼 제출 처리
-        document.getElementById('constructionForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const title = formData.get('title');
-            const date = formData.get('date');
-            const description = formData.get('description');
-            const imageFile = formData.get('image');
-            
-            // 이미지를 base64로 변환
-            const imageData = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // base64 데이터에서 data:image/...;base64, 부분 제거
-                    const base64Data = e.target.result.split(',')[1];
-                    resolve(base64Data);
-                };
-                reader.readAsDataURL(imageFile);
-            });
-            
-            const jsonData = {
-                title: title,
-                date: date,
-                description: description,
-                imageData: imageData,
-                imageName: imageFile.name
-            };
-            
-            try {
-                const response = await fetch('/.netlify/functions/submit-construction', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(jsonData)
-                });
-                
-                if (response.ok) {
-                    alert('게시물이 성공적으로 등록되었습니다.');
-                    window.location.href = 'construction.html';
-                } else {
-                    const error = await response.text();
-                    alert('게시물 등록에 실패했습니다: ' + error);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('게시물 등록 중 오류가 발생했습니다.');
-            }
-        });
-
-        // 페이지 로드 시 로그인 상태 확인
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, checking login status');
-            
-            // 로컬 스토리지에서 관리자 로그인 상태 확인
-            const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
-            const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
-            
-            if (adminLoggedIn && adminInfo.username) {
-                updateLoginStatus(adminInfo);
-            } else {
-                updateLoginStatus(null);
-            }
-            
-            // 오늘 날짜를 기본값으로 설정
-            document.getElementById('date').value = new Date().toISOString().split('T')[0];
-        });
     </script>
 </body>
 </html> 

@@ -40,6 +40,36 @@ CREATE POLICY "Allow anonymous insert" ON estimates
 -- 관리자 삭제 권한 (모든 행 삭제 가능)
 CREATE POLICY "Allow admin delete" ON estimates
   FOR DELETE USING (true);
+
+-- 시공사진 테이블 생성
+CREATE TABLE construction (
+  id BIGSERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  date DATE NOT NULL,
+  description TEXT NOT NULL,
+  image_data TEXT NOT NULL,
+  image_name TEXT,
+  status TEXT DEFAULT '활성',
+  ip_address TEXT,
+  user_agent TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- RLS (Row Level Security) 설정
+ALTER TABLE construction ENABLE ROW LEVEL SECURITY;
+
+-- 익명 사용자 읽기 권한
+CREATE POLICY "Allow anonymous read access" ON construction
+  FOR SELECT USING (status = '활성');
+
+-- 익명 사용자 삽입 권한
+CREATE POLICY "Allow anonymous insert" ON construction
+  FOR INSERT WITH CHECK (true);
+
+-- 관리자 삭제 권한 (상태 변경으로 삭제 처리)
+CREATE POLICY "Allow admin update" ON construction
+  FOR UPDATE USING (true);
 ```
 
 ## 3. Netlify 환경 변수 설정
