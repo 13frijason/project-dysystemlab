@@ -136,22 +136,22 @@
         }
 
         .write-button {
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: var(--white);
+            padding: 7px 14px;
+            background-color: #6c757d;
+            color: white;
             border: none;
             border-radius: 5px;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             transition: all 0.3s;
         }
 
         .write-button:hover {
-            background-color: var(--secondary-color);
+            background-color: #5a6268;
             transform: translateY(-2px);
         }
 
@@ -347,6 +347,10 @@
                     <i class="fas fa-plus"></i>
                     시공사진 등록
                 </a>
+                <a href="admin-login.html" id="login-required-button" class="write-button" style="display: none;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    관리자 로그인
+                </a>
             </div>
         </div>
 
@@ -409,6 +413,7 @@
             const logoutButton = document.getElementById('logout-button');
             const adminLink = document.getElementById('admin-link');
             const writeButton = document.getElementById('write-button');
+            const loginRequiredButton = document.getElementById('login-required-button');
             
             // 로컬 스토리지에서 관리자 로그인 상태 확인
             const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -421,6 +426,7 @@
                 logoutButton.style.display = 'inline-block';
                 adminLink.style.display = 'inline-block';
                 writeButton.style.display = 'inline-flex';
+                loginRequiredButton.style.display = 'none';
                 logoutButton.onclick = () => {
                     // 로그아웃 처리
                     localStorage.removeItem('adminLoggedIn');
@@ -435,6 +441,7 @@
                 logoutButton.style.display = 'none';
                 adminLink.style.display = 'none';
                 writeButton.style.display = 'none';
+                loginRequiredButton.style.display = 'inline-flex';
                 loginButton.onclick = () => {
                     console.log('Login button clicked');
                     // 관리자 로그인 페이지로 이동
