@@ -443,7 +443,9 @@
             const dotsContainer = document.querySelector('.nav-dots');
             
             let currentIndex = 0;
+            let autoSlideInterval;
             const slideWidth = slides[0].offsetWidth;
+            const autoSlideDelay = 4000; // 4초마다 자동 슬라이드
             
             // 도트 생성
             slides.forEach((_, index) => {
@@ -460,22 +462,65 @@
                 updateDots();
             }
             
+            function nextSlide() {
+                if (currentIndex < slides.length - 1) {
+                    goToSlide(currentIndex + 1);
+                } else {
+                    goToSlide(0); // 마지막 슬라이드에서 첫 번째로 돌아가기
+                }
+            }
+            
+            function prevSlide() {
+                if (currentIndex > 0) {
+                    goToSlide(currentIndex - 1);
+                } else {
+                    goToSlide(slides.length - 1); // 첫 번째 슬라이드에서 마지막으로
+                }
+            }
+            
             function updateDots() {
                 document.querySelectorAll('.dot').forEach((dot, index) => {
                     dot.classList.toggle('active', index === currentIndex);
                 });
             }
             
-            prevBtn.addEventListener('click', () => {
-                if (currentIndex > 0) {
-                    goToSlide(currentIndex - 1);
+            function startAutoSlide() {
+                autoSlideInterval = setInterval(nextSlide, autoSlideDelay);
+            }
+            
+            function stopAutoSlide() {
+                if (autoSlideInterval) {
+                    clearInterval(autoSlideInterval);
                 }
+            }
+            
+            // 자동 슬라이드 시작
+            startAutoSlide();
+            
+            // 마우스 호버 시 자동 슬라이드 일시정지
+            const sliderContainer = document.querySelector('.slider-container');
+            sliderContainer.addEventListener('mouseenter', stopAutoSlide);
+            sliderContainer.addEventListener('mouseleave', startAutoSlide);
+            
+            // 버튼 클릭 이벤트
+            prevBtn.addEventListener('click', () => {
+                stopAutoSlide();
+                prevSlide();
+                startAutoSlide();
             });
             
             nextBtn.addEventListener('click', () => {
-                if (currentIndex < slides.length - 1) {
-                    goToSlide(currentIndex + 1);
-                }
+                stopAutoSlide();
+                nextSlide();
+                startAutoSlide();
+            });
+            
+            // 도트 클릭 시 자동 슬라이드 재시작
+            document.querySelectorAll('.dot').forEach(dot => {
+                dot.addEventListener('click', () => {
+                    stopAutoSlide();
+                    startAutoSlide();
+                });
             });
         }
 
