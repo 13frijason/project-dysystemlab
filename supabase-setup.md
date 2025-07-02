@@ -8,11 +8,13 @@
 
 ## 2. 데이터베이스 테이블 생성
 
+### 견적문의 테이블 (이미 생성된 경우 건너뛰기)
+
 SQL 편집기에서 다음 쿼리 실행:
 
 ```sql
--- 견적문의 테이블 생성
-CREATE TABLE estimates (
+-- 견적문의 테이블 생성 (이미 존재하는 경우 오류 무시)
+CREATE TABLE IF NOT EXISTS estimates (
   id BIGSERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   name TEXT NOT NULL,
@@ -29,20 +31,28 @@ CREATE TABLE estimates (
 -- RLS (Row Level Security) 설정
 ALTER TABLE estimates ENABLE ROW LEVEL SECURITY;
 
--- 익명 사용자 읽기 권한
-CREATE POLICY "Allow anonymous read access" ON estimates
-  FOR SELECT USING (true);
+-- 정책이 존재하지 않는 경우에만 생성
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'estimates' AND policyname = 'Allow anonymous read access') THEN
+    CREATE POLICY "Allow anonymous read access" ON estimates FOR SELECT USING (true);
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'estimates' AND policyname = 'Allow anonymous insert') THEN
+    CREATE POLICY "Allow anonymous insert" ON estimates FOR INSERT WITH CHECK (true);
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'estimates' AND policyname = 'Allow admin delete') THEN
+    CREATE POLICY "Allow admin delete" ON estimates FOR DELETE USING (true);
+  END IF;
+END $$;
+```
 
--- 익명 사용자 삽입 권한
-CREATE POLICY "Allow anonymous insert" ON estimates
-  FOR INSERT WITH CHECK (true);
+### 시공사진 테이블 생성
 
--- 관리자 삭제 권한 (모든 행 삭제 가능)
-CREATE POLICY "Allow admin delete" ON estimates
-  FOR DELETE USING (true);
-
+```sql
 -- 시공사진 테이블 생성
-CREATE TABLE construction (
+CREATE TABLE IF NOT EXISTS construction (
   id BIGSERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   date DATE NOT NULL,
@@ -59,15 +69,13 @@ CREATE TABLE construction (
 -- RLS (Row Level Security) 설정
 ALTER TABLE construction ENABLE ROW LEVEL SECURITY;
 
--- 익명 사용자 읽기 권한
+-- 시공사진 테이블 정책 생성
 CREATE POLICY "Allow anonymous read access" ON construction
   FOR SELECT USING (status = '활성');
 
--- 익명 사용자 삽입 권한
 CREATE POLICY "Allow anonymous insert" ON construction
   FOR INSERT WITH CHECK (true);
 
--- 관리자 삭제 권한 (상태 변경으로 삭제 처리)
 CREATE POLICY "Allow admin update" ON construction
   FOR UPDATE USING (true);
 ```
