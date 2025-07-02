@@ -9,9 +9,49 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
+        .login-button {
+            background-color: #6c757d;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.875rem;
+            transition: background-color 0.3s;
+            display: inline-block;
+            line-height: 1.5;
+            vertical-align: baseline;
+            border: none;
+            margin: 0;
+        }
+
+        .login-button:hover {
+            background-color: #5a6268;
+        }
+
+        .admin-button {
+            background-color: #28a745;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.875rem;
+            transition: background-color 0.3s;
+            display: inline-block;
+            line-height: 1.5;
+            vertical-align: baseline;
+            border: none;
+            margin: 0;
+        }
+
+        .admin-button:hover {
+            background-color: #218838;
+        }
+
         .construction-form-container {
             max-width: 800px;
-            margin: 2rem auto;
+            margin: 120px auto 50px;
             padding: 2rem;
             background: white;
             border-radius: 10px;
@@ -172,9 +212,59 @@
             display: none;
         }
 
+        /* 반응형 네비게이션 */
         @media (max-width: 768px) {
+            .navbar-nav {
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .navbar-nav .nav-item {
+                margin: 0.25rem 0;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .login-button, .admin-button {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.8rem;
+                margin: 0.25rem 0;
+                display: inline-block;
+            }
+            
+            .navbar-brand {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .navbar-toggler {
+                margin-bottom: 0.5rem;
+            }
+            
+            .navbar-collapse {
+                padding: 1rem 0;
+            }
+            
+            .footer-login-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+            
+            .footer-login-buttons .login-button,
+            .footer-login-buttons .admin-button {
+                margin-right: 0;
+                width: auto;
+                min-width: 80px;
+            }
+            
             .construction-form-container {
-                margin: 1rem;
+                margin: 100px 1rem 50px;
                 padding: 1.5rem;
             }
             
@@ -185,6 +275,47 @@
             .submit-button {
                 padding: 0.875rem 1.5rem;
                 font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-nav .nav-link {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.8rem;
+            }
+            
+            .login-button, .admin-button {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.4rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1rem;
+            }
+            
+            .footer-login-buttons {
+                gap: 0.3rem;
+            }
+            
+            .footer-login-buttons .login-button,
+            .footer-login-buttons .admin-button {
+                font-size: 0.65rem;
+                padding: 0.12rem 0.25rem;
+                min-width: 60px;
+            }
+        }
+
+        /* 모바일에서 더 작은 화면을 위한 추가 스타일 */
+        @media (max-width: 480px) {
+            .footer-login-buttons .login-button,
+            .footer-login-buttons .admin-button {
+                font-size: 0.6rem;
+                padding: 0.1rem 0.2rem;
+                min-width: 55px;
+            }
+            
+            .footer-login-buttons {
+                gap: 0.2rem;
             }
         }
     </style>
@@ -266,13 +397,13 @@
                 <h3>
                     <img src="static/company_logo.png" alt="로고" style="height:28px; max-width:100px; object-fit:contain; vertical-align:middle; margin-right:8px;"> 
                     DYSystemlab
-                    <div class="footer-login-buttons" style="display: inline-flex; margin-left: 1rem;">
-                        <a href="#" id="login-button" class="login-button" style="display: none;">로그인</a>
-                        <a href="#" id="logout-button" class="login-button" style="display: none;">로그아웃</a>
-                        <a href="/admin/" id="admin-link" class="admin-button" style="display: none;">관리자</a>
-                    </div>
                 </h3>
                 <p>최고의 전문성과 서비스로 고객님께 만족을 드리겠습니다.</p>
+                <div class="footer-login-buttons" style="margin-top: 1rem;">
+                    <a href="#" id="login-button" class="login-button" style="display: none; margin-right: 0.5rem;">로그인</a>
+                    <a href="#" id="logout-button" class="login-button" style="display: none; margin-right: 0.5rem;">로그아웃</a>
+                    <a href="/admin/" id="admin-link" class="admin-button" style="display: none; margin-left: 2rem;">관리자</a>
+                </div>
             </div>
             <div class="footer-contact">
                 <p><i class="fas fa-phone"></i> 010-2789-3051</p>
@@ -280,12 +411,60 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 DYSystemlab. All rights reserved.</p>
+            <p>&copy; 2025 DYSystemlab. All rights reserved.</p>
         </div>
     </footer>
 
     <script>
         let selectedImage = null;
+
+        // Netlify Identity 초기화
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                updateLoginStatus(user);
+            });
+            
+            window.netlifyIdentity.on("login", user => {
+                updateLoginStatus(user);
+            });
+            
+            window.netlifyIdentity.on("logout", () => {
+                updateLoginStatus(null);
+            });
+        }
+
+        function updateLoginStatus(user) {
+            const loginButton = document.getElementById('login-button');
+            const logoutButton = document.getElementById('logout-button');
+            const adminLink = document.getElementById('admin-link');
+            
+            // 로컬 스토리지에서 관리자 로그인 상태 확인
+            const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+            
+            if (adminLoggedIn && adminInfo.username) {
+                // 관리자 로그인 상태
+                loginButton.style.display = 'none';
+                logoutButton.style.display = 'inline-block';
+                adminLink.style.display = 'inline-block';
+                logoutButton.onclick = () => {
+                    // 로그아웃 처리
+                    localStorage.removeItem('adminLoggedIn');
+                    localStorage.removeItem('adminInfo');
+                    updateLoginStatus(null);
+                    alert('로그아웃되었습니다.');
+                };
+            } else {
+                // 로그아웃 상태
+                loginButton.style.display = 'inline-block';
+                logoutButton.style.display = 'none';
+                adminLink.style.display = 'none';
+                loginButton.onclick = () => {
+                    // 관리자 로그인 페이지로 이동
+                    window.location.href = 'admin-login.html';
+                };
+            }
+        }
 
         // 이미지 업로드 영역 클릭 이벤트
         document.getElementById('imageUploadArea').addEventListener('click', () => {
@@ -432,8 +611,19 @@
             }
         }
 
-        // 페이지 로드 시 오늘 날짜를 기본값으로 설정
+        // 페이지 로드 시 로그인 상태 확인 및 오늘 날짜 설정
         document.addEventListener('DOMContentLoaded', () => {
+            // 로컬 스토리지에서 관리자 로그인 상태 확인
+            const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+            
+            if (adminLoggedIn && adminInfo.username) {
+                updateLoginStatus(adminInfo);
+            } else {
+                updateLoginStatus(null);
+            }
+            
+            // 오늘 날짜를 기본값으로 설정
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('date').value = today;
         });
