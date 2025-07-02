@@ -98,6 +98,132 @@
             font-size: 1.1rem;
         }
 
+        /* 게시판 스타일 */
+        .board-container {
+            max-width: 1200px;
+            margin: 120px auto 50px;
+            padding: 0 20px;
+        }
+
+        .board-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .board-title-section {
+            flex: 1;
+        }
+
+        .board-title {
+            font-size: 2rem;
+            color: var(--text-color);
+            margin: 0 0 5px 0;
+        }
+
+        .board-subtitle {
+            color: #666;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .board-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .write-button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .write-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .write-button i {
+            font-size: 1.1em;
+        }
+
+        /* 시공사진 카드 스타일 */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .post-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .post-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-content {
+            padding: 20px;
+        }
+
+        .post-content h3 {
+            margin: 0 0 10px 0;
+            color: var(--text-color);
+            font-size: 1.2rem;
+        }
+
+        .post-date {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .post-text {
+            color: var(--text-color);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .board-title {
+                font-size: 1.5rem;
+            }
+            
+            .posts-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+        }
+
         /* 반응형 네비게이션 */
         @media (max-width: 768px) {
             .navbar-nav {
@@ -134,6 +260,20 @@
             .navbar-collapse {
                 padding: 1rem 0;
             }
+            
+            .footer-login-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+            
+            .footer-login-buttons .login-button,
+            .footer-login-buttons .admin-button {
+                margin-right: 0;
+                width: auto;
+                min-width: 80px;
+            }
         }
 
         @media (max-width: 576px) {
@@ -149,6 +289,31 @@
             
             .navbar-brand {
                 font-size: 1rem;
+            }
+            
+            .footer-login-buttons {
+                gap: 0.3rem;
+            }
+            
+            .footer-login-buttons .login-button,
+            .footer-login-buttons .admin-button {
+                font-size: 0.65rem;
+                padding: 0.12rem 0.25rem;
+                min-width: 60px;
+            }
+        }
+
+        /* 모바일에서 더 작은 화면을 위한 추가 스타일 */
+        @media (max-width: 480px) {
+            .footer-login-buttons .login-button,
+            .footer-login-buttons .admin-button {
+                font-size: 0.6rem;
+                padding: 0.1rem 0.2rem;
+                min-width: 55px;
+            }
+            
+            .footer-login-buttons {
+                gap: 0.2rem;
             }
         }
     </style>
@@ -171,12 +336,16 @@
         </nav>
     </header>
 
-    <div class="construction-board">
+    <div class="board-container">
         <div class="board-header">
-            <h1>시공사진 게시판</h1>
-            <div id="write-button-container" style="display: none;">
-                <a href="construction_form.html" class="write-button">
-                    <i class="fas fa-plus"></i> 글 작성
+            <div class="board-title-section">
+                <h1 class="board-title">시공사진 게시판</h1>
+                <p class="board-subtitle">완료된 시공사례들을 확인하실 수 있습니다</p>
+            </div>
+            <div class="board-actions">
+                <a href="construction_form.html" id="write-button" class="write-button" style="display: none;">
+                    <i class="fas fa-plus"></i>
+                    시공사진 등록
                 </a>
             </div>
         </div>
@@ -206,7 +375,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 DYSystemlab. All rights reserved.</p>
+            <p>&copy; 2025 DYSystemlab. All rights reserved.</p>
         </div>
     </footer>
 
@@ -239,7 +408,7 @@
             const loginButton = document.getElementById('login-button');
             const logoutButton = document.getElementById('logout-button');
             const adminLink = document.getElementById('admin-link');
-            const writeButtonContainer = document.getElementById('write-button-container');
+            const writeButton = document.getElementById('write-button');
             
             // 로컬 스토리지에서 관리자 로그인 상태 확인
             const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -251,7 +420,7 @@
                 loginButton.style.display = 'none';
                 logoutButton.style.display = 'inline-block';
                 adminLink.style.display = 'inline-block';
-                writeButtonContainer.style.display = 'block';
+                writeButton.style.display = 'inline-flex';
                 logoutButton.onclick = () => {
                     // 로그아웃 처리
                     localStorage.removeItem('adminLoggedIn');
@@ -265,7 +434,7 @@
                 loginButton.style.display = 'inline-block';
                 logoutButton.style.display = 'none';
                 adminLink.style.display = 'none';
-                writeButtonContainer.style.display = 'none';
+                writeButton.style.display = 'none';
                 loginButton.onclick = () => {
                     console.log('Login button clicked');
                     // 관리자 로그인 페이지로 이동
