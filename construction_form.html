@@ -361,7 +361,7 @@
     </header>
 
     <div class="construction-form-container">
-        <a href="construction.html" class="back-button">
+        <a href="construction.html" class="back-button" id="back-button" style="display: none;">
             <i class="fas fa-arrow-left"></i>
             목록으로 돌아가기
         </a>
@@ -475,6 +475,7 @@
             const adminLink = document.getElementById('admin-link');
             const loginRequired = document.getElementById('login-required');
             const formContent = document.getElementById('form-content');
+            const backButton = document.getElementById('back-button');
             
             // 로컬 스토리지에서 관리자 로그인 상태 확인
             const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -487,6 +488,7 @@
                 adminLink.style.display = 'inline-block';
                 loginRequired.style.display = 'none';
                 formContent.style.display = 'block';
+                backButton.style.display = 'inline-flex';
                 logoutButton.onclick = () => {
                     // 로그아웃 처리
                     localStorage.removeItem('adminLoggedIn');
@@ -501,6 +503,7 @@
                 adminLink.style.display = 'none';
                 loginRequired.style.display = 'block';
                 formContent.style.display = 'none';
+                backButton.style.display = 'none';
                 loginButton.onclick = () => {
                     // 관리자 로그인 페이지로 이동
                     window.location.href = 'admin-login.html';

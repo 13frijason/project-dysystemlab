@@ -51,10 +51,10 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Supabase에서 데이터 삭제 (실제 삭제 대신 상태를 '삭제됨'으로 변경)
+        // Supabase에서 데이터 삭제
         const { data: deletedConstruction, error } = await supabase
             .from('construction')
-            .update({ status: '삭제됨' })
+            .delete()
             .eq('id', data.id)
             .select()
             .single();
