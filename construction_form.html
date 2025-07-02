@@ -569,6 +569,15 @@
         document.getElementById('constructionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // 로그인 상태 재확인
+            const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+            
+            if (!adminLoggedIn || !adminInfo.username) {
+                showError('관리자 로그인이 필요합니다.');
+                return;
+            }
+            
             if (!selectedImage) {
                 showError('시공사진을 선택해주세요.');
                 return;
@@ -583,6 +592,14 @@
                 imageName: document.getElementById('imageUpload').files[0]?.name || 'image.jpg'
             };
 
+            console.log('Submitting construction data:', {
+                title: data.title,
+                date: data.date,
+                description: data.description,
+                imageName: data.imageName,
+                imageDataLength: data.imageData ? data.imageData.length : 0
+            });
+
             // 로딩 상태 표시
             showLoading(true);
             hideMessages();
@@ -596,7 +613,9 @@
                     body: JSON.stringify(data)
                 });
 
+                console.log('Submit response status:', response.status);
                 const result = await response.json();
+                console.log('Submit response:', result);
 
                 if (result.success) {
                     showSuccess('시공사진이 성공적으로 등록되었습니다.');

@@ -69,15 +69,29 @@ CREATE TABLE IF NOT EXISTS construction (
 -- RLS (Row Level Security) 설정
 ALTER TABLE construction ENABLE ROW LEVEL SECURITY;
 
--- 시공사진 테이블 정책 생성
-CREATE POLICY "Allow anonymous read access" ON construction
-  FOR SELECT USING (status = '활성');
-
-CREATE POLICY "Allow anonymous insert" ON construction
-  FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Allow admin update" ON construction
-  FOR UPDATE USING (true);
+-- 시공사진 테이블 정책 생성 (조건부 생성)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'construction' AND policyname = 'Allow anonymous read access') THEN
+    CREATE POLICY "Allow anonymous read access" ON construction
+      FOR SELECT USING (status = '활성');
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'construction' AND policyname = 'Allow anonymous insert') THEN
+    CREATE POLICY "Allow anonymous insert" ON construction
+      FOR INSERT WITH CHECK (true);
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'construction' AND policyname = 'Allow admin update') THEN
+    CREATE POLICY "Allow admin update" ON construction
+      FOR UPDATE USING (true);
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'construction' AND policyname = 'Allow admin delete') THEN
+    CREATE POLICY "Allow admin delete" ON construction
+      FOR DELETE USING (true);
+  END IF;
+END $$;
 ```
 
 ## 3. Netlify 환경 변수 설정
