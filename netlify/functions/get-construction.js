@@ -7,6 +7,29 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// 백그라운드 자동 복구 시도
+async function attemptBackgroundRecovery() {
+  try {
+    // 자동 복구 함수 호출
+    const recoveryResponse = await fetch('/.netlify/functions/auto-recovery', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-recovery-key': process.env.RECOVERY_API_KEY || 'auto-recovery-key-2024'
+      }
+    });
+    
+    if (recoveryResponse.ok) {
+      const result = await recoveryResponse.json();
+      if (result.success && result.recovery_result) {
+        console.log(`Background recovery successful: ${result.recovery_result.total_recovered} items recovered`);
+      }
+    }
+  } catch (error) {
+    console.warn('Background recovery attempt failed:', error.message);
+  }
+}
+
 // 백업 파일에서 시공사진 데이터 가져오기
 async function getConstructionFromBackup(page, perPage) {
   try {
@@ -124,6 +147,17 @@ exports.handler = async (event, context) => {
       dataSource = 'backup';
       
       console.log(`Found ${finalConstruction.length} construction posts from backup files, total count: ${finalTotal}`);
+      
+      // 백그라운드에서 자동 복구 시도 (비동기, 응답에 영향 없음)
+      setTimeout(async () => {
+        try {
+          console.log('Attempting background recovery...');
+          await attemptBackgroundRecovery();
+        } catch (recoveryError) {
+          console.warn('Background recovery failed:', recoveryError.message);
+        }
+      }, 100);
+      
     } else {
       finalConstruction = construction || [];
       finalTotal = count || 0;
