@@ -1,9 +1,64 @@
 const { createClient } = require('@supabase/supabase-js');
+const fs = require('fs');
+const path = require('path');
 
 // Supabase 클라이언트 초기화
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+// 백업 파일에서 시공사진 데이터 가져오기
+async function getConstructionFromBackup(page, perPage) {
+  try {
+    console.log('Fetching construction from backup files...');
+    
+    const constructionDir = path.join(process.cwd(), 'content', 'construction');
+    
+    if (!fs.existsSync(constructionDir)) {
+      console.log('No construction backup directory found');
+      return { construction: [], total: 0 };
+    }
+    
+    const files = fs.readdirSync(constructionDir).filter(file => file.endsWith('.json'));
+    
+    const allConstruction = [];
+    
+    for (const file of files) {
+      try {
+        const filePath = path.join(constructionDir, file);
+        const content = fs.readFileSync(filePath, 'utf8');
+        const data = JSON.parse(content);
+        
+        // 활성 상태인 데이터만 추가
+        if (data.status === '활성') {
+          allConstruction.push(data);
+        }
+      } catch (fileError) {
+        console.warn(`Failed to read construction backup file ${file}:`, fileError.message);
+      }
+    }
+    
+    // 생성일 기준으로 정렬 (최신순)
+    allConstruction.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    const total = allConstruction.length;
+    const from = (page - 1) * perPage;
+    const to = from + perPage - 1;
+    
+    const paginatedConstruction = allConstruction.slice(from, to + 1);
+    
+    console.log(`Found ${total} construction posts from backup files, returning ${paginatedConstruction.length} for page ${page}`);
+    
+    return {
+      construction: paginatedConstruction,
+      total: total
+    };
+    
+  } catch (error) {
+    console.error('Error reading construction backup files:', error);
+    return { construction: [], total: 0 };
+  }
+}
 
 exports.handler = async (event, context) => {
   console.log('get-construction function called');
@@ -54,17 +109,31 @@ exports.handler = async (event, context) => {
       .order('created_at', { ascending: false })
       .range(from, to);
 
+    let finalConstruction = [];
+    let finalTotal = 0;
+    let dataSource = 'supabase';
+
     if (error) {
       console.error('Supabase error:', error);
-      throw new Error(`데이터베이스 조회 실패: ${error.message}`);
+      console.log('Supabase 실패, 백업 파일에서 데이터 가져오기...');
+      
+      // Supabase 실패 시 백업 파일에서 데이터 가져오기
+      const backupData = await getConstructionFromBackup(page, perPage);
+      finalConstruction = backupData.construction;
+      finalTotal = backupData.total;
+      dataSource = 'backup';
+      
+      console.log(`Found ${finalConstruction.length} construction posts from backup files, total count: ${finalTotal}`);
+    } else {
+      finalConstruction = construction || [];
+      finalTotal = count || 0;
+      console.log(`Found ${finalConstruction.length} construction posts from Supabase, total count: ${finalTotal}`);
     }
 
-    console.log(`Found ${construction.length} construction posts from Supabase, total count: ${count}`);
-
-    const totalPages = Math.ceil((count || 0) / perPage);
+    const totalPages = Math.ceil(finalTotal / perPage);
     const hasMore = page < totalPages;
 
-    console.log(`Pagination: page ${page}, perPage ${perPage}, total ${count}, totalPages ${totalPages}`);
+    console.log(`Pagination: page ${page}, perPage ${perPage}, total ${finalTotal}, totalPages ${totalPages}, dataSource: ${dataSource}`);
 
     // 캐시 방지 헤더 설정
     headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
@@ -75,12 +144,14 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        construction: construction || [],
-        total: count || 0,
+        construction: finalConstruction,
+        total: finalTotal,
         page: page,
         per_page: perPage,
         total_pages: totalPages,
-        has_more: hasMore
+        has_more: hasMore,
+        data_source: dataSource,
+        message: dataSource === 'backup' ? '백업 파일에서 데이터를 가져왔습니다.' : '정상적으로 데이터를 가져왔습니다.'
       })
     };
 
