@@ -45,7 +45,7 @@ exports.handler = async (event, context) => {
 
     console.log(`Fetching construction: page ${page}, perPage ${perPage}, from ${from}, to ${to}`);
 
-    // Supabase에서 데이터 가져오기
+    // Supabase에서 데이터 가져오기 (모든 활성 상태 데이터)
     console.log('Fetching from Supabase...');
     const { data: construction, error, count } = await supabase
       .from('construction')

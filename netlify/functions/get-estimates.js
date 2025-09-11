@@ -45,7 +45,7 @@ exports.handler = async (event, context) => {
 
     console.log(`Fetching estimates: page ${page}, perPage ${perPage}, from ${from}, to ${to}`);
 
-    // Supabase에서 데이터 가져오기
+    // Supabase에서 데이터 가져오기 (모든 데이터, 만료되지 않은 것만)
     console.log('Fetching from Supabase...');
     const { data: estimates, error, count } = await supabase
       .from('estimates')

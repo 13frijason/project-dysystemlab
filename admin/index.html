@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관리자 페이지 - 도연시스템연구소</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
     <style>
@@ -42,6 +43,59 @@
         .logout-button:hover {
             background-color: #c82333;
         }
+        .admin-controls {
+            background-color: #fff;
+            padding: 1rem;
+            margin: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .control-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .control-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .control-btn:hover {
+            background-color: #0056b3;
+        }
+        .backup-btn {
+            background-color: #28a745;
+        }
+        .backup-btn:hover {
+            background-color: #218838;
+        }
+        .restore-btn {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .restore-btn:hover {
+            background-color: #e0a800;
+        }
+        .status-message {
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            display: none;
+        }
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
         #nc-root {
             margin-top: 1rem;
         }
@@ -55,6 +109,27 @@
         </h1>
         <button class="logout-button" onclick="handleLogout()">로그아웃</button>
     </div>
+    
+    <div class="admin-controls">
+        <h3><i class="fas fa-database"></i> 데이터 관리</h3>
+        <div class="control-buttons">
+            <button class="control-btn backup-btn" onclick="backupData()">
+                <i class="fas fa-download"></i> 데이터 백업
+            </button>
+            <button class="control-btn restore-btn" onclick="showRestoreDialog()">
+                <i class="fas fa-upload"></i> 데이터 복원
+            </button>
+            <button class="control-btn" onclick="restoreFromBackup()" style="background-color: #dc3545;">
+                <i class="fas fa-history"></i> 백업에서 복구
+            </button>
+            <button class="control-btn" onclick="refreshData()">
+                <i class="fas fa-sync"></i> 새로고침
+            </button>
+        </div>
+        <div id="status-message" class="status-message"></div>
+        <input type="file" id="restore-file" accept=".json" style="display: none;" onchange="restoreData()">
+    </div>
+    
     <div id="nc-root"></div>
 
     <script>
@@ -72,6 +147,170 @@
             if (window.netlifyIdentity) {
                 window.netlifyIdentity.logout();
                 window.location.href = "/login.html";
+            }
+        }
+
+        // 상태 메시지 표시
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 데이터 백업
+        async function backupData() {
+            try {
+                showStatus('데이터 백업 중...', 'success');
+                
+                const response = await fetch('/.netlify/functions/backup-data', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 백업 파일 다운로드
+                    const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showStatus(`백업 완료: 견적문의 ${result.data.total_estimates}개, 시공사진 ${result.data.total_construction}개`, 'success');
+                } else {
+                    showStatus('백업 실패: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Backup error:', error);
+                showStatus('백업 중 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        // 복원 다이얼로그 표시
+        function showRestoreDialog() {
+            document.getElementById('restore-file').click();
+        }
+
+        // 데이터 복원
+        async function restoreData() {
+            const file = document.getElementById('restore-file').files[0];
+            if (!file) return;
+
+            if (!confirm('데이터를 복원하시겠습니까? 기존 데이터가 덮어쓰여질 수 있습니다.')) {
+                return;
+            }
+
+            try {
+                showStatus('데이터 복원 중...', 'success');
+                
+                const text = await file.text();
+                const backupData = JSON.parse(text);
+                
+                const response = await fetch('/.netlify/functions/restore-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(backupData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus(`복원 완료: 견적문의 ${result.restored_estimates}개, 시공사진 ${result.restored_construction}개`, 'success');
+                } else {
+                    showStatus('복원 실패: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Restore error:', error);
+                showStatus('복원 중 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        // 데이터 새로고침
+        function refreshData() {
+            showStatus('페이지를 새로고침합니다...', 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        // 백업 파일에서 데이터 복구
+        async function restoreFromBackup() {
+            if (!confirm('백업 파일에서 데이터를 복구하시겠습니까?\n\n이 작업은 기존 데이터를 덮어쓸 수 있습니다.')) {
+                return;
+            }
+
+            try {
+                showStatus('백업 파일에서 데이터를 복구하는 중...', 'success');
+                
+                // 먼저 백업 파일 목록 확인
+                const listResponse = await fetch('/.netlify/functions/restore-from-backup', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const listResult = await listResponse.json();
+                
+                if (!listResult.success) {
+                    throw new Error(listResult.error || '백업 파일 목록을 가져오는데 실패했습니다.');
+                }
+                
+                if (listResult.count === 0) {
+                    showStatus('복구할 백업 파일이 없습니다.', 'error');
+                    return;
+                }
+                
+                // 복구할 데이터가 있으면 복구 실행
+                if (confirm(`${listResult.count}개의 백업 파일을 찾았습니다.\n복구를 진행하시겠습니까?`)) {
+                    const restoreResponse = await fetch('/.netlify/functions/restore-from-backup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const restoreResult = await restoreResponse.json();
+                    
+                    if (restoreResult.success) {
+                        showStatus(
+                            `복구 완료: ${restoreResult.restored_count}개 데이터 복구됨` + 
+                            (restoreResult.error_count > 0 ? `, ${restoreResult.error_count}개 오류` : ''),
+                            restoreResult.error_count > 0 ? 'warning' : 'success'
+                        );
+                        
+                        // 복구된 데이터 정보 표시
+                        if (restoreResult.restored_data && restoreResult.restored_data.length > 0) {
+                            const dataList = restoreResult.restored_data.map(item => 
+                                `• ${item.title} (${item.name})`
+                            ).join('\n');
+                            
+                            setTimeout(() => {
+                                alert(`복구된 견적문의:\n\n${dataList}`);
+                            }, 2000);
+                        }
+                    } else {
+                        showStatus('복구 실패: ' + restoreResult.error, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Restore from backup error:', error);
+                showStatus('복구 중 오류가 발생했습니다: ' + error.message, 'error');
             }
         }
     </script>

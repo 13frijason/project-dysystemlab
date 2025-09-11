@@ -55,13 +55,50 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Supabase에서 견적문의 삭제
+    // 인증 토큰 확인 (선택적)
+    const authHeader = event.headers.authorization;
+    if (authHeader && authHeader.includes('Bearer')) {
+      console.log('Authorization header present, validating token...');
+      // 토큰이 있으면 유효성 검사 (실제 구현에서는 JWT 검증)
+      // 여기서는 단순히 토큰 존재 여부만 확인
+    }
+
+    // Supabase에서 견적문의 삭제 (재시도 로직 포함)
     console.log('Attempting to delete from Supabase...');
-    const { data, error, count } = await supabase
-      .from('estimates')
-      .delete()
-      .eq('id', id)
-      .select();
+    let deleteResult;
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      try {
+        deleteResult = await supabase
+          .from('estimates')
+          .delete()
+          .eq('id', id)
+          .select();
+        
+        if (deleteResult.error && deleteResult.error.code === 'PGRST301') {
+          // RLS 정책 오류인 경우 재시도
+          retryCount++;
+          if (retryCount < maxRetries) {
+            console.log(`RLS policy error, retrying... (${retryCount}/${maxRetries})`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            continue;
+          }
+        }
+        break;
+      } catch (retryError) {
+        retryCount++;
+        if (retryCount < maxRetries) {
+          console.log(`Delete attempt ${retryCount} failed, retrying...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          continue;
+        }
+        throw retryError;
+      }
+    }
+    
+    const { data, error, count } = deleteResult;
 
     console.log('Supabase delete response:', { data, error, count });
 
