@@ -485,6 +485,17 @@
             
             console.log('Construction posts:', data.construction);
             
+            // 데이터 소스 표시 (백업 파일에서 온 경우 알림)
+            let dataSourceNotice = '';
+            if (data.data_source === 'backup') {
+                dataSourceNotice = `
+                    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>백업 모드:</strong> 현재 백업 파일에서 시공사진을 표시하고 있습니다. Supabase가 복구되면 자동으로 정상 모드로 전환됩니다.
+                    </div>
+                `;
+            }
+            
             const postsHTML = data.construction.map(post => {
                 console.log('Processing post:', post);
                 console.log('Image data length:', post.image_data ? post.image_data.length : 0);
@@ -523,7 +534,7 @@
                 `;
             }).join('');
             
-            container.innerHTML = `<div class="posts-grid">${postsHTML}</div>`;
+            container.innerHTML = `${dataSourceNotice}<div class="posts-grid">${postsHTML}</div>`;
         }
 
         // 게시물 삭제 함수
