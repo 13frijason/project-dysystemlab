@@ -408,7 +408,7 @@
                 <div id="imageUploadArea" class="image-upload-area">
                     <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem;"></i>
                     <p>클릭하여 사진을 선택하거나 여기에 드래그하세요</p>
-                    <p style="font-size: 0.9rem; color: #999;">지원 형식: JPG, PNG, GIF (최대 5MB)</p>
+                    <p style="font-size: 0.9rem; color: #999;">지원 형식: JPG, PNG, GIF (최대 2MB)</p>
                     <input type="file" id="imageUpload" accept="image/*" style="display: none;" required>
                 </div>
                 <img id="imagePreview" class="image-preview" alt="미리보기">
@@ -547,9 +547,9 @@
 
         // 이미지 파일 처리
         function handleImageFile(file) {
-            // 파일 크기 검증 (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                showError('파일 크기는 5MB 이하여야 합니다.');
+            // 파일 크기 검증 (2MB로 줄임)
+            if (file.size > 2 * 1024 * 1024) {
+                showError('파일 크기는 2MB 이하여야 합니다. 이미지를 압축하거나 더 작은 파일을 선택해주세요.');
                 return;
             }
 
@@ -561,9 +561,37 @@
 
             const reader = new FileReader();
             reader.onload = (e) => {
-                selectedImage = e.target.result;
-                document.getElementById('imagePreview').src = selectedImage;
-                document.getElementById('imagePreview').style.display = 'block';
+                // 이미지 압축을 위한 Canvas 사용
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // 이미지 크기 조정 (최대 800px)
+                    const maxWidth = 800;
+                    const maxHeight = 600;
+                    let { width, height } = img;
+                    
+                    if (width > maxWidth || height > maxHeight) {
+                        const ratio = Math.min(maxWidth / width, maxHeight / height);
+                        width *= ratio;
+                        height *= ratio;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // 이미지 그리기
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // 압축된 이미지를 base64로 변환
+                    selectedImage = canvas.toDataURL('image/jpeg', 0.8);
+                    document.getElementById('imagePreview').src = selectedImage;
+                    document.getElementById('imagePreview').style.display = 'block';
+                    
+                    console.log('이미지 압축 완료:', selectedImage.length, 'bytes');
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -622,11 +650,20 @@
                 });
 
                 console.log('Submit response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`서버 오류 (${response.status}): ${response.statusText}`);
+                }
+                
                 const result = await response.json();
                 console.log('Submit response:', result);
 
                 if (result.success) {
-                    showSuccess('시공사진이 성공적으로 등록되었습니다.');
+                    if (result.backup) {
+                        showSuccess('시공사진이 백업 파일로 저장되었습니다. (Supabase 일시중지 상태)');
+                    } else {
+                        showSuccess('시공사진이 성공적으로 등록되었습니다.');
+                    }
                     e.target.reset();
                     document.getElementById('imagePreview').style.display = 'none';
                     selectedImage = null;
@@ -640,7 +677,14 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showError(error.message || '시공사진 등록 중 오류가 발생했습니다.');
+                let errorMessage = error.message || '시공사진 등록 중 오류가 발생했습니다.';
+                
+                // 네트워크 오류인지 확인
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMessage = '네트워크 연결을 확인해주세요.';
+                }
+                
+                showError(errorMessage);
             } finally {
                 showLoading(false);
             }

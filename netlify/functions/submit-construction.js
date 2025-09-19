@@ -107,6 +107,16 @@ exports.handler = async (event, context) => {
             };
         }
 
+        // 이미지 데이터 크기 검증 (base64 문자열이 너무 크면 안됨)
+        if (data.imageData && data.imageData.length > 3 * 1024 * 1024) { // 3MB 제한
+            console.log('Image data too large:', data.imageData.length, 'bytes');
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: '이미지 파일이 너무 큽니다. 더 작은 이미지를 선택해주세요.' })
+            };
+        }
+
         // Supabase에 데이터 저장
         const { data: construction, error } = await supabase
             .from('construction')
@@ -153,12 +163,28 @@ exports.handler = async (event, context) => {
                             backup: true
                         })
                     };
+                } else {
+                    console.error('백업 파일 저장 실패:', backupResult.error);
+                    return {
+                        statusCode: 500,
+                        headers,
+                        body: JSON.stringify({ 
+                            error: '시공사진 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
+                            details: `Supabase 오류: ${error.message}, 백업 오류: ${backupResult.error}`
+                        })
+                    };
                 }
             } catch (backupError) {
                 console.error('백업 파일 저장도 실패:', backupError);
+                return {
+                    statusCode: 500,
+                    headers,
+                    body: JSON.stringify({ 
+                        error: '시공사진 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
+                        details: `Supabase 오류: ${error.message}, 백업 오류: ${backupError.message}`
+                    })
+                };
             }
-            
-            throw new Error(`데이터베이스 저장 실패: ${error.message}`);
         }
 
         console.log('Successfully saved to Supabase:', construction);
