@@ -7,27 +7,11 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// 백그라운드 자동 복구 시도
+// 백그라운드 자동 복구 시도 - 비활성화됨
 async function attemptBackgroundRecovery() {
-  try {
-    // 자동 복구 함수 호출
-    const recoveryResponse = await fetch('/.netlify/functions/auto-recovery', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-recovery-key': process.env.RECOVERY_API_KEY || 'auto-recovery-key-2024'
-      }
-    });
-    
-    if (recoveryResponse.ok) {
-      const result = await recoveryResponse.json();
-      if (result.success && result.recovery_result) {
-        console.log(`Background recovery successful: ${result.recovery_result.total_recovered} items recovered`);
-      }
-    }
-  } catch (error) {
-    console.warn('Background recovery attempt failed:', error.message);
-  }
+  console.log('Background recovery disabled');
+  // 자동복구 기능이 비활성화됨
+  return;
 }
 
 // 백업 파일에서 견적문의 데이터 가져오기

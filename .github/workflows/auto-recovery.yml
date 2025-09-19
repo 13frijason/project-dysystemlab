@@ -1,9 +1,10 @@
 name: Auto Recovery Check
 
 on:
-  schedule:
-    # 매 5분마다 실행
-    - cron: '*/5 * * * *'
+  # 자동복구 기능 비활성화됨
+  # schedule:
+  #   # 매 5분마다 실행
+  #   - cron: '*/5 * * * *'
   workflow_dispatch: # 수동 실행 가능
 
 jobs:

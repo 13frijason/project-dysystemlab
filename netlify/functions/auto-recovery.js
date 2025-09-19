@@ -8,7 +8,7 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event, context) => {
-  console.log('auto-recovery function called');
+  console.log('auto-recovery function called - DISABLED');
   
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -25,44 +25,16 @@ exports.handler = async (event, context) => {
     };
   }
 
-  try {
-    // 인증 확인 (API 키 또는 특별한 헤더)
-    const authHeader = event.headers['x-recovery-key'];
-    const expectedKey = process.env.RECOVERY_API_KEY || 'auto-recovery-key-2024';
-    
-    if (authHeader !== expectedKey) {
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ error: 'Unauthorized' })
-      };
-    }
-
-    if (event.httpMethod === 'GET') {
-      // Supabase 상태 체크 및 자동 복구
-      return await checkAndRecover(headers);
-    } else if (event.httpMethod === 'POST') {
-      // 수동 복구 실행
-      return await manualRecovery(event, headers);
-    }
-
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-
-  } catch (error) {
-    console.error('Auto recovery error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        error: '자동 복구 중 오류가 발생했습니다.',
-        details: error.message
-      })
-    };
-  }
+  // 자동복구 기능이 비활성화됨
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({
+      success: false,
+      message: '자동복구 기능이 비활성화되었습니다.',
+      disabled: true
+    })
+  };
 };
 
 // Supabase 상태 체크 및 자동 복구
