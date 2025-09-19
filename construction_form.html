@@ -409,7 +409,7 @@
                     <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem;"></i>
                     <p>클릭하여 사진을 선택하거나 여기에 드래그하세요</p>
                     <p style="font-size: 0.9rem; color: #999;">지원 형식: JPG, PNG, GIF (최대 2MB)</p>
-                    <input type="file" id="imageUpload" accept="image/*" style="display: none;" required>
+                    <input type="file" id="imageUpload" accept="image/*" style="position: absolute; left: -9999px; opacity: 0;" required>
                 </div>
                 <img id="imagePreview" class="image-preview" alt="미리보기">
             </div>
@@ -545,6 +545,11 @@
             }
         });
 
+        // 업로드 영역 클릭 시 파일 선택 창 열기
+        document.getElementById('imageUploadArea').addEventListener('click', () => {
+            document.getElementById('imageUpload').click();
+        });
+
         // 이미지 파일 처리
         function handleImageFile(file) {
             // 파일 크기 검증 (2MB로 줄임)
@@ -614,8 +619,16 @@
                 return;
             }
             
-            if (!selectedImage) {
+            // 이미지 파일 유효성 검사
+            const imageFile = document.getElementById('imageUpload').files[0];
+            if (!imageFile) {
                 showError('시공사진을 선택해주세요.');
+                document.getElementById('imageUpload').focus();
+                return;
+            }
+            
+            if (!selectedImage) {
+                showError('이미지 처리 중 오류가 발생했습니다. 다시 선택해주세요.');
                 return;
             }
 
