@@ -395,10 +395,10 @@
                 const container = document.getElementById('projects-container');
                 
                 if (data.construction && data.construction.length > 0) {
-                    // 최신 6개만 표시
-                    const recentProjects = data.construction.slice(0, 6);
+                    // 모든 게시물 표시
+                    const allProjects = data.construction;
                     
-                    recentProjects.forEach(project => {
+                    allProjects.forEach(project => {
                         // 이미지 데이터 처리
                         let imageSrc = '';
                         if (project.image_data) {
